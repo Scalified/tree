@@ -1,0 +1,10 @@
+allprojects {
+
+    group = POM_GROUP_ID
+    version = POM_VERSION
+
+    repositories {
+        mavenCentral()
+    }
+
+}
