@@ -1,5 +1,10 @@
 apply plugin: 'java'
 
+// Publishing
+if (hasProperty('JAR_PUBLISHING_SCRIPT')) {
+	apply from: properties['JAR_PUBLISHING_SCRIPT']
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
 }

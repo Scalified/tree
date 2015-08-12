@@ -153,6 +153,7 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	 * Populates the input collection with the tree nodes, while traversing the tree
 	 *
 	 * @param collection input collection to populate
+	 * @param <T> type of the tree node
 	 * @return traversal action, which populates the input collection with the tree nodes
 	 */
 	protected static <T> TraversalAction<TreeNode<T>> populateAction(final Collection<TreeNode<T>> collection) {

@@ -21,7 +21,6 @@ package com.software.shell.util.tree.multinode;
 import com.software.shell.util.tree.AbstractTreeNodeTest;
 import com.software.shell.util.tree.TreeNode;
 import com.software.shell.util.tree.TreeNodeException;
-import com.sun.org.apache.bcel.internal.generic.MULTIANEWARRAY;
 import org.junit.Test;
 
 import java.util.ArrayList;
