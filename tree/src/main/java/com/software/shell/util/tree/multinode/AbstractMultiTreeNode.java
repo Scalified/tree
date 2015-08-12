@@ -22,9 +22,7 @@ import com.software.shell.util.tree.AbstractTreeNode;
 import com.software.shell.util.tree.TreeNode;
 import com.software.shell.util.tree.TreeNodeException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Abstract implementation of the K-ary (multiple node) tree data structure
@@ -42,40 +40,6 @@ abstract class AbstractMultiTreeNode<T> extends AbstractTreeNode<T> implements M
 	 */
 	protected AbstractMultiTreeNode(T data) {
 		super(data);
-	}
-
-	/**
-	 * Size of the tree, starting from the current tree node
-	 */
-	protected int size = 1;
-
-	/**
-	 * Returns the number of nodes in the entire tree, including the current tree node
-	 *
-	 * @return number of nodes in the entire tree, including the current tree node
-	 */
-	@Override
-	public int size() {
-		return size;
-	}
-
-	/**
-	 * Changes the size on each tree node vertically up starting
-	 * from the current tree node and moving up until the root node
-	 * <p>
-	 * Is called in case of adding or removing any subtree
-	 * <p>
-	 * Positive argument value means increasing the size; negative -
-	 * decreasing
-	 *
-	 * @param delta delta, which size was changed at
-	 */
-	protected void changeSize(int delta) {
-		AbstractMultiTreeNode<T> mNode = this;
-		do {
-			mNode.size += delta;
-			mNode = (AbstractMultiTreeNode<T>) mNode.parent();
-		} while (mNode != null);
 	}
 
 	/**
@@ -157,6 +121,37 @@ abstract class AbstractMultiTreeNode<T> extends AbstractTreeNode<T> implements M
 			}
 		}
 		return mResult;
+	}
+
+	/**
+	 * Returns the next right sibling of the current tree node if the current
+	 * tree node is not root
+	 *
+	 * @return next right sibling of the current tree node if the current tree
+	 *         node is not root
+	 * @throws TreeNodeException an exception that is thrown in case if the
+	 *                           current tree node is root
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public AbstractTreeNode<T> nextSibling() {
+		if (isRoot()) {
+			String message = String.format("Failed to determine the next sibling. " + NODE_IS_ROOT_MESSAGE, this);
+			throw new TreeNodeException(message);
+		}
+		Collection<? extends TreeNode<T>> mParentSubtrees = parent().subtrees();
+		if (mParentSubtrees.size() == 1) {
+			return null;
+		} else {
+			Iterator<? extends TreeNode<T>> mSubtreesIterator = mParentSubtrees.iterator();
+			while (mSubtreesIterator.hasNext()) {
+				if (this.equals(mSubtreesIterator.next())
+						&& mSubtreesIterator.hasNext()) {
+					return (AbstractTreeNode<T>) mSubtreesIterator.next();
+				}
+			}
+			return null;
+		}
 	}
 
 }

@@ -18,12 +18,12 @@
 
 package com.software.shell.util.tree.multinode;
 
+import com.software.shell.util.tree.AbstractTreeNode;
 import com.software.shell.util.tree.TraversalAction;
 import com.software.shell.util.tree.TreeNode;
 import com.software.shell.util.tree.TreeNodeException;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Implementation of the K-ary (multi node) tree data structure,
@@ -95,6 +95,25 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		}
 		this.branchingFactor = branchingFactor;
 		this.subtrees = new Object[branchingFactor];
+	}
+
+	/**
+	 * Returns the first subtree of the current tree node if the current
+	 * tree node is not a leaf
+	 *
+	 * @return first subtree of the current tree node if the current tree
+	 *         node is not a leaf
+	 * @throws TreeNodeException an exception that is thrown in case if the
+	 *                           current tree node is leaf
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public AbstractTreeNode<T> firstSubtree() {
+		if (isLeaf()) {
+			String message = String.format("Failed to determine the first subtree. " + NODE_IS_LEAF_MESSAGE, this);
+			throw new TreeNodeException(message);
+		}
+		return (AbstractTreeNode<T>) subtrees[0];
 	}
 
 	/**
@@ -181,7 +200,6 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		if (mSubtreeIndex < 0) {
 			return false;
 		}
-		changeSize(-subtree.size());
 		int mNumShift = subtreesSize - mSubtreeIndex - 1;
 		if (mNumShift > 0) {
 			System.arraycopy(subtrees, mSubtreeIndex + 1, subtrees, mSubtreeIndex, mNumShift);
@@ -260,7 +278,6 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 			return false;
 		}
 		assignParent(subtree, this);
-		changeSize(subtree.size());
 		ensureSubtreesCapacity(subtreesSize + 1);
 		subtrees[subtreesSize++] = subtree;
 		return true;
@@ -305,13 +322,10 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	 * Removes all the subtrees with all of its descendants from the current
 	 * tree node
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
 		if (!isLeaf()) {
 			for (int i = 0; i < subtreesSize; i++) {
-				TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-				changeSize(-mSubtree.size());
 				subtrees[i] = null;
 			}
 			subtreesSize = 0;
@@ -333,7 +347,9 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean remove(TreeNode<T> node) {
-		if (isLeaf() || node == null || node.isRoot()) {
+		if (isLeaf()
+				|| node == null
+				|| node.isRoot()) {
 			return false;
 		}
 		if (dropSubtree(node)) {
@@ -349,7 +365,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	}
 
 	/**
-	 * Traverses the tree in a preordered manner starting from the
+	 * Traverses the tree in a pre ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 * <p>
@@ -371,7 +387,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	}
 
 	/**
-	 * Traverses the tree in a postordered manner starting from the
+	 * Traverses the tree in a post ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 * <p>
@@ -468,7 +484,6 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		}
 		for (MultiTreeNode<T> mSubtree : subtrees) {
 			assignParent(mSubtree, this);
-			changeSize(-mSubtree.size());
 		}
 		Object[] subtreesArray = subtrees.toArray();
 		int subtreesArrayLength = subtreesArray.length;
@@ -476,223 +491,6 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		System.arraycopy(subtreesArray, 0, this.subtrees, subtreesSize, subtreesArrayLength);
 		subtreesSize += subtreesArrayLength;
 		return subtreesArrayLength != 0;
-	}
-
-	/**
-	 * Indicates whether subtrees of the specified node equal to the
-	 * subtrees of the current node
-	 *
-	 * @param node node, which subtrees are to be compared
-	 * @return {@code true} if subtrees of the specified node equal
-	 *         to the subtrees of the current node; {@code false}
-	 *         otherwise
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	protected boolean subtreesEqual(TreeNode<T> node) {
-		ArrayMultiTreeNode<T> that = (ArrayMultiTreeNode<T>) node;
-		return Arrays.equals(this.subtrees, that.subtrees);
-	}
-
-	/**
-	 * Returns the hash code value of the current tree node subtrees
-	 *
-	 * @return hash code value of the current tree node subtrees
-	 */
-	@Override
-	protected int subtreesHashCode() {
-		return Arrays.hashCode(subtrees);
-	}
-
-	/**
-	 * Returns an iterator over the elements in this tree in proper sequence
-	 * <p>
-	 * The returned iterator is <b>fail-fast</b>
-	 *
-	 * @return an iterator over the elements in this tree in proper sequence
-	 */
-	@Override
-	public Iterator<TreeNode<T>> iterator() {
-		return new ArrayMultiTreeNodeIterator();
-	}
-
-	/**
-	 * Tree node iterator implementation
-	 */
-	private class ArrayMultiTreeNodeIterator implements Iterator<TreeNode<T>> {
-
-		/**
-		 * An expected size of the tree node required to check
-		 * whether the tree node was changed during <b>foreach</b>
-		 * iteration
-		 */
-		int expectedSize = ArrayMultiTreeNode.this.size;
-
-		/**
-		 * Stack of indexes of the subtrees, parents of which
-		 * has more than one subtree
-		 * <p>
-		 * Required for proper navigation between sibling tree
-		 * nodes
-		 */
-		final Deque<Integer> indexes = new ArrayDeque<>();
-
-		/**
-		 * Reference to the current tree node within iteration
-		 */
-		TreeNode<T> currentNode;
-
-		/**
-		 * Reference to the next tree node within iteration
-		 */
-		ArrayMultiTreeNode<T> nextNode = ArrayMultiTreeNode.this;
-
-		/**
-		 * Indicates whether there is a next tree node available
-		 * within iteration
-		 */
-		boolean nextPresent = ArrayMultiTreeNode.this.isRoot() || !ArrayMultiTreeNode.this.isLeaf();
-
-		/**
-		 * Returns {@code true} if the iteration has more elements;
-		 * otherwise returns {@code false}
-		 *
-		 * @return {@code true} if the iteration has more elements;
-		 *         {@code false} otherwise
-		 */
-		@Override
-		public boolean hasNext() {
-			return nextPresent;
-		}
-
-		/**
-		 * Returns the next element in the iteration
-		 *
-		 * @return the next element in the iteration
-		 * @throws NoSuchElementException if the iteration has no more elements
-		 */
-		@SuppressWarnings("unchecked")
-		@Override
-		public TreeNode<T> next() {
-			checkForConcurrentModification();
-			if (!hasNext()) {
-				throw new NoSuchElementException();
-			}
-			currentNode = nextNode;
-			if (nextNode.isLeaf()) {
-				if (nextNode.isRoot()) {
-					nextPresent = false;
-				} else {
-					ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) nextNode.parent();
-					while (true) {
-						if (mParent.subtreesSize > 1) {
-							int nextIndex = indexes.pollLast() + 1;
-							if (mParent.subtreesSize > nextIndex) {
-								indexes.addLast(nextIndex);
-								nextNode = (ArrayMultiTreeNode<T>) mParent.subtrees[nextIndex];
-								break;
-							}
-						}
-
-						else {
-							indexes.removeLast();
-						}
-
-						if (mParent.equals(ArrayMultiTreeNode.this)) {
-							nextPresent = false;
-							break;
-						}
-						mParent = (ArrayMultiTreeNode<T>) mParent.parent();
-					}
-				}
-			} else {
-//				if (nextNode.subtreesSize > 1) {
-//					indexes.addLast(0);
-//				}
-				indexes.addLast(0);
-				nextNode = (ArrayMultiTreeNode<T>) nextNode.subtrees[0];
-			}
-			return currentNode;
-		}
-
-		/**
-		 * Checks whether tree node was changed during <b>foreach</b>
-		 * iteration and throws {@link ConcurrentModificationException}
-		 * exception if so
-		 */
-		private void checkForConcurrentModification() {
-			if (ArrayMultiTreeNode.this.size != expectedSize) {
-				throw new ConcurrentModificationException();
-			}
-		}
-
-		/**
-		 * Removes from the underlying tree the last element returned by this
-		 * iterator (optional operation)
-		 * <p>
-		 * This method can be called only once per call to {@link #next}.
-		 * The behavior of an iterator is unspecified if the underlying tree
-		 * is modified while the iteration is in progress in any way other
-		 * than by calling this method
-		 *
-		 * @throws IllegalStateException an exception that may be thrown in case
-		 *                               if remove was performed without any
-		 *                               iteration
-		 * @throws TreeNodeException an exception that may be thrown in case if
-		 *                           remove was performed on a root node
-		 */
-		@SuppressWarnings("unchecked")
-		@Override
-		public void remove() {
-			String errorMessage = "Unable to remove the tree node. ";
-			if (currentNode == null) {
-				throw new IllegalStateException(errorMessage + "The iteration has not been performed yet");
-			}
-			if (currentNode.isRoot()) {
-				String message = String.format(errorMessage + NODE_IS_ROOT_MESSAGE, currentNode);
-				throw new TreeNodeException(message);
-			}
-			if (currentNode.equals(ArrayMultiTreeNode.this)) {
-				String message = errorMessage + "The starting node can't be removed";
-				throw new TreeNodeException(message);
-			}
-			checkForConcurrentModification();
-			ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) currentNode.parent();
-//			boolean mParentWithMultipleSubtrees = mParent.size() > 1 && !indexes.isEmpty();
-//			int mIndex = mParentWithMultipleSubtrees ? indexes.pollLast() : 0;
-
-//			if (mParent.size() > 1 && !indexes.isEmpty()) {
-//				mIndex = indexes.pollLast();
-//				System.out.println(mIndex);
-//				nextNode = (ArrayMultiTreeNode<T>) mParent.subtrees[mIndex];
-//			} else {
-//				nextNode = mParent;
-//			}
-
-			int mLevel = currentNode.level();
-			while (mLevel < indexes.size()) {
-				indexes.removeLast();
-			}
-
-			int mIndex = indexes.pollLast();
-
-			int mNumShift = mParent.subtreesSize - mIndex - 1;
-			if (mNumShift > 0) {
-				System.arraycopy(mParent.subtrees, mIndex + 1, mParent.subtrees, mIndex, mNumShift);
-			}
-			mParent.subtrees[--mParent.subtreesSize] = null;
-			changeSize(-currentNode.size());
-			unAssignParent(currentNode);
-//			nextNode = mParent.size() > 1 && !indexes.isEmpty() ? (ArrayMultiTreeNode<T>) mParent.subtrees[mIndex] : mParent;
-			if (mParent.size > 1 && !indexes.isEmpty()) {
-				nextNode = (ArrayMultiTreeNode<T>) mParent.subtrees[mIndex];
-				indexes.addLast(mIndex);
-			} else {
-				nextNode = mParent;
-			}
-			expectedSize = size;
-		}
-
 	}
 
 }

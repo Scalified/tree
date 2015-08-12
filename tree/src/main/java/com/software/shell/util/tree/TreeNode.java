@@ -63,10 +63,10 @@ import java.util.Collection;
  *                                  of parentheses in the expression or by the precedence and
  *                                  associativity rules for the operators involved</li>
  *     <li><b>Branching Factor</b> - maximum number of children a node can have</li>
- *     <li><b>Preorder</b> - a form of tree traversal, where the action is called firstly on
- *                           the current node, and then the preorder function is called again
+ *     <li><b>Pre order</b> - a form of tree traversal, where the action is called firstly on
+ *                           the current node, and then the pre order function is called again
  *                           recursively on each of the subtree from left to right</li>
- *     <li><b>Postorder</b> - a form of tree traversal, where the postorder function is called
+ *     <li><b>Post order</b> - a form of tree traversal, where the post order function is called
  *                            recursively on each subtree from left to right and then the
  *                            action is called</li>
  * </ul>
@@ -235,7 +235,7 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	boolean removeAll(Collection<TreeNode<T>> nodes);
 
 	/**
-	 * Traverses the tree in a preordered manner starting from the
+	 * Traverses the tree in a pre ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 *
@@ -245,7 +245,7 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	void traversePreOrder(TraversalAction<TreeNode<T>> action);
 
 	/**
-	 * Traverses the tree in a postordered manner starting from the
+	 * Traverses the tree in a post ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 *
@@ -255,16 +255,16 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	void traversePostOrder(TraversalAction<TreeNode<T>> action);
 
 	/**
-	 * Returns the preordered collection of nodes of the current tree
+	 * Returns the pre ordered collection of nodes of the current tree
 	 *
-	 * @return preordered collection of nodes of the current tree
+	 * @return pre ordered collection of nodes of the current tree
 	 */
 	Collection<? extends TreeNode<T>> preOrdered();
 
 	/**
-	 * Returns the postordered collection of nodes of the current tree
+	 * Returns the post ordered collection of nodes of the current tree
 	 *
-	 * @return postordered collection of nodes of the current tree
+	 * @return post ordered collection of nodes of the current tree
 	 */
 	Collection<? extends TreeNode<T>> postOrdered();
 
@@ -330,7 +330,7 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *
 	 * @return number of nodes in the entire tree, including the current tree node
 	 */
-	int size();
+	long size();
 
 	/**
 	 * Returns the height of the current tree node, e.g. the number of edges

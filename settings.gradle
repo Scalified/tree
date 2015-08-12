@@ -1,2 +1,2 @@
-rootProject.name = 'tree'
-include 'tree'
+rootProject.name = 'tree-root'
+include ':tree'

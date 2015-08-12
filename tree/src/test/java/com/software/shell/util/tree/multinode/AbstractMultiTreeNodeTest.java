@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * @version 1.0.0
  * @since 1.0.0
  */
-abstract class AbstractMultiTreeNodeTest extends AbstractTreeNodeTest {
+public abstract class AbstractMultiTreeNodeTest extends AbstractTreeNodeTest {
 
 	/*
 	 * Test tree structure

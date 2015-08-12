@@ -19,6 +19,7 @@
 package com.software.shell.util.tree;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Abstract implementation of the basic tree data structure
@@ -41,6 +42,11 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	protected static final String NODE_IS_ROOT_MESSAGE = "The tree node %1$s is root";
 
 	/**
+	 * Message used to indicate that the specified tree node is leaf
+	 */
+	protected static final String NODE_IS_LEAF_MESSAGE = "The tree node %1$s is leaf";
+
+	/**
 	 * Message used to indicate that the specified tree node is not the descendant of the current tree node
 	 */
 	protected static final String NODE_IS_NOT_THE_DESCENDANT_MESSAGE = "The specified tree node %1$s is not the " +
@@ -50,6 +56,16 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	 * Message used to indicate that the tree node is null
 	 */
 	protected static final String NODE_IS_NULL_MESSAGE = "The specified tree node is null";
+
+	/**
+	 * Hash generator, used to get a unique hash for each created tree node
+	 */
+	private static final AtomicLong HASH_GENERATOR = new AtomicLong(0);
+
+	/**
+	 * A unique hash, used to distinguish or compare the tree nodes
+	 */
+	private final long hash = HASH_GENERATOR.getAndIncrement();
 
 	/**
 	 * Reference to the parent tree node. Is {@code null} if the current tree node is root
@@ -69,6 +85,28 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	protected AbstractTreeNode(T data) {
 		this.data = data;
 	}
+
+	/**
+	 * Returns the first subtree of the current tree node if the current
+	 * tree node is not a leaf
+	 *
+	 * @return first subtree of the current tree node if the current tree
+	 *         node is not a leaf
+	 * @throws TreeNodeException an exception that is thrown in case if the
+	 *                           current tree node is leaf
+	 */
+	protected abstract AbstractTreeNode<T> firstSubtree();
+
+	/**
+	 * Returns the next right sibling of the current tree node if the current
+	 * tree node is not root
+	 *
+	 * @return next right sibling of the current tree node if the current tree
+	 *         node is not root
+	 * @throws TreeNodeException an exception that is thrown in case if the
+	 *                           current tree node is root
+	 */
+	protected abstract AbstractTreeNode<T> nextSibling();
 
 	/**
 	 * Assigns the specified parent tree node reference to the specified tree node
@@ -335,7 +373,7 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	}
 
 	/**
-	 * Traverses the tree in a preordered manner starting from the
+	 * Traverses the tree in a pre ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 *
@@ -353,7 +391,7 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	}
 
 	/**
-	 * Traverses the tree in a postordered manner starting from the
+	 * Traverses the tree in a post ordered manner starting from the
 	 * current tree node and performs the traversal action on each
 	 * traversed tree node
 	 *
@@ -371,9 +409,9 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	}
 
 	/**
-	 * Returns the preordered collection of nodes of the current tree
+	 * Returns the pre ordered collection of nodes of the current tree
 	 *
-	 * @return preordered collection of nodes of the current tree
+	 * @return pre ordered collection of nodes of the current tree
 	 */
 	@Override
 	public Collection<TreeNode<T>> preOrdered() {
@@ -387,9 +425,9 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	}
 
 	/**
-	 * Returns the postordered collection of nodes of the current tree
+	 * Returns the post ordered collection of nodes of the current tree
 	 *
-	 * @return postordered collection of nodes of the current tree
+	 * @return post ordered collection of nodes of the current tree
 	 */
 	@Override
 	public Collection<TreeNode<T>> postOrdered() {
@@ -548,11 +586,11 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	 * @return number of nodes in the entire tree, including the current tree node
 	 */
 	@Override
-	public int size() {
+	public long size() {
 		if (isLeaf()) {
 			return 1;
 		}
-		final int[] count = {0};
+		final long[] count = {0};
 		TraversalAction<TreeNode<T>> action = new TraversalAction<TreeNode<T>>() {
 			@Override
 			public void perform(TreeNode<T> node) {
@@ -614,9 +652,9 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	public TreeNode<T> clone() {
 		try {
 			return (TreeNode<T>) super.clone();
-		} catch (CloneNotSupportedException cnse) {
+		} catch (CloneNotSupportedException e) {
 			String message = "Unable to clone the current tree node";
-			throw new TreeNodeException(message, cnse);
+			throw new TreeNodeException(message, e);
 		}
 	}
 
@@ -637,13 +675,9 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 				|| getClass() != obj.getClass()) {
 			return false;
 		}
-		TreeNode<T> that = (TreeNode<T>) obj;
-		return (this.data() != null ? this.data().equals(that.data()) : that.data() == null)
-				&& ((this.isRoot() && that.isRoot())
-					|| (!this.isRoot() && !that.isRoot()
-					&& (this.parent().data() != null ?
-						this.parent().data().equals(that.parent().data()) : that.parent().data() == null)))
-				&& ((isLeaf() && that.isLeaf()) || subtreesEqual(that));
+		AbstractTreeNode<T> that = (AbstractTreeNode<T>) obj;
+		return this.hash == that.hash
+				&& (this.data() != null ? this.data().equals(that.data()) : that.data() == null);
 	}
 
 	/**
@@ -653,31 +687,12 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 	 */
 	@Override
 	public int hashCode() {
-		int mHashCode = data != null ? data.hashCode() : 1;
-		if (!isRoot() && parent.data() != null) {
-			mHashCode = 31 * mHashCode + parent.data().hashCode();
+		int mHashCode = (int) (this.hash ^ (this.hash >>> 32));
+		if (data() != null) {
+			mHashCode = 31 * mHashCode + data().hashCode();
 		}
-		mHashCode = 31 * mHashCode + subtreesHashCode();
 		return mHashCode;
 	}
-
-	/**
-	 * Indicates whether subtrees of the specified node equal to the
-	 * subtrees of the current node
-	 *
-	 * @param node node, which subtrees are to be compared
-	 * @return {@code true} if subtrees of the specified node equal
-	 *         to the subtrees of the current node; {@code false}
-	 *         otherwise
-	 */
-	protected abstract boolean subtreesEqual(TreeNode<T> node);
-
-	/**
-	 * Returns the hash code value of the current tree node subtrees
-	 *
-	 * @return hash code value of the current tree node subtrees
-	 */
-	protected abstract int subtreesHashCode();
 
 	/**
 	 * Returns the string representation of this object
@@ -704,6 +719,162 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 		};
 		traversePreOrder(action);
 		return builder.toString();
+	}
+
+	/**
+	 * Returns an iterator over the elements in this tree in proper sequence
+	 * <p>
+	 * The returned iterator is <b>fail-fast</b>
+	 *
+	 * @return an iterator over the elements in this tree in proper sequence
+	 */
+	@Override
+	public Iterator<TreeNode<T>> iterator() {
+		return new TreeNodeIterator();
+	}
+
+	/**
+	 * Tree node iterator implementation
+	 */
+	private class TreeNodeIterator implements Iterator<TreeNode<T>> {
+
+		/**
+		 * An expected size of the tree node required to check
+		 * whether the tree node was changed during <b>foreach</b>
+		 * iteration
+		 */
+		long expectedSize = size();
+
+		/**
+		 * Reference to the current tree node within iteration
+		 */
+		TreeNode<T> currentNode;
+
+		/**
+		 * Reference to the next tree node within iteration
+		 */
+		AbstractTreeNode<T> nextNode = AbstractTreeNode.this;
+
+		/**
+		 * Indicates whether there is a next tree node available
+		 * within iteration
+		 */
+		boolean nextNodeAvailable = true;
+
+		/**
+		 * Returns {@code true} if the iteration has more elements;
+		 * otherwise returns {@code false}
+		 *
+		 * @return {@code true} if the iteration has more elements;
+		 *         {@code false} otherwise
+		 */
+		@Override
+		public boolean hasNext() {
+			return nextNodeAvailable;
+		}
+
+		/**
+		 * Returns the next element in the iteration
+		 *
+		 * @return the next element in the iteration
+		 * @throws NoSuchElementException if the iteration has no more elements
+		 */
+		@Override
+		public TreeNode<T> next() {
+			checkForConcurrentModification();
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			currentNode = nextNode;
+			if (nextNode.isLeaf()) {
+				if (nextNode.isRoot()) {
+					nextNodeAvailable = false;
+				} else {
+					do {
+						AbstractTreeNode<T> mCurrent = nextNode;
+						nextNode = (AbstractTreeNode<T>) nextNode.parent();
+						if (mCurrent.equals(AbstractTreeNode.this)) {
+							nextNodeAvailable = false;
+							break;
+						}
+						AbstractTreeNode<T> mNextSibling = mCurrent.nextSibling();
+						if (mNextSibling != null) {
+							nextNode = mNextSibling;
+							break;
+						}
+					} while (true);
+				}
+			} else {
+				nextNode = nextNode.firstSubtree();
+			}
+			return currentNode;
+		}
+
+		/**
+		 * Checks whether tree node was changed during <b>foreach</b>
+		 * iteration and throws {@link ConcurrentModificationException}
+		 * exception if so
+		 */
+		void checkForConcurrentModification() {
+			if (expectedSize != size()) {
+				throw new ConcurrentModificationException();
+			}
+		}
+
+		/**
+		 * Removes from the underlying tree the last element returned by this
+		 * iterator (optional operation)
+		 * <p>
+		 * This method can be called only once per call to {@link #next}.
+		 * The behavior of an iterator is unspecified if the underlying tree
+		 * is modified while the iteration is in progress in any way other
+		 * than by calling this method
+		 *
+		 * @throws IllegalStateException an exception that may be thrown in case
+		 *                               if remove was performed without any
+		 *                               iteration
+		 * @throws TreeNodeException an exception that may be thrown in case if
+		 *                           remove was performed on a root node
+		 */
+		@Override
+		public void remove() {
+			String errorMessage = "Failed to remove the tree node. ";
+			if (!isIterationStarted()) {
+				throw new IllegalStateException(errorMessage + "The iteration has not been performed yet");
+			}
+			if (currentNode.isRoot()) {
+				String message = String.format(errorMessage + NODE_IS_ROOT_MESSAGE, currentNode);
+				throw new TreeNodeException(message);
+			}
+			if (currentNode.equals(AbstractTreeNode.this)) {
+				throw new TreeNodeException(errorMessage + "The starting node can't be removed");
+			}
+			checkForConcurrentModification();
+			AbstractTreeNode<T> mParent = (AbstractTreeNode<T>) currentNode;
+			while (true) {
+				if (mParent.isRoot()) {
+					nextNodeAvailable = false;
+					break;
+				} else if (mParent.nextSibling() != null) {
+					currentNode = nextNode = mParent.nextSibling();
+					break;
+				} else {
+					mParent = (AbstractTreeNode<T>) mParent.parent();
+				}
+			}
+			currentNode.parent().dropSubtree(currentNode);
+			expectedSize = size();
+		}
+
+		/**
+		 * Returns whether iteration has been started
+		 *
+		 * @return {@code true} if iteration has been started; {@code false} otherwise
+		 */
+		boolean isIterationStarted() {
+			return currentNode != null;
+		}
+
 	}
 
 }

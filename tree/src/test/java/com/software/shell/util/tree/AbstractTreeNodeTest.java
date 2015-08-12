@@ -242,7 +242,6 @@ public abstract class AbstractTreeNodeTest {
 		TreeNode<String> mAnotherNode2 = createTreeNode(ANOTHER_NODE_DATA);
 		node1.add(mAnotherNode1);
 		node1.add(mAnotherNode2);
-		assertEquals(mAnotherNode1, mAnotherNode2);
 		assertTrue(messageDropExpected, node1.remove(mAnotherNode1));
 		assertFalse(messageDropNotExpected, node1.contains(mAnotherNode1));
 		assertTrue(messageDropNotExpected, node1.contains(mAnotherNode2));
@@ -650,10 +649,10 @@ public abstract class AbstractTreeNodeTest {
 	public void testSize() {
 		// Test the specified tree node size is correctly calculated
 		String message = "Tree node size was incorrectly calculated";
-		assertSame(message, 1, node6.size());
-		assertSame(message, 2, node9.size());
-		assertSame(message, 4, node3.size());
-		assertSame(message, 11, root.size());
+		assertSame(message, 1L, node6.size());
+		assertSame(message, 2L, node9.size());
+		assertSame(message, 4L, node3.size());
+		assertSame(message, 11L, root.size());
 	}
 
 	@Test
@@ -693,40 +692,18 @@ public abstract class AbstractTreeNodeTest {
 		String messageNotEqual =
 				"The specified tree node was not expected to be equal to the current tree node, but actually was";
 
+		assertEquals(messageEqual, root, root);
+		assertEquals(messageEqual, node1, node1);
+		assertEquals(messageEqual, node7, node7);
+
+		assertNotEquals(messageNotEqual, root, node1);
+		assertNotEquals(messageNotEqual, root, node7);
+		assertNotEquals(messageNotEqual, node9, node10);
+
+		// Test the created tree nodes with the same data are not equal
 		TreeNode<String> mAnotherNode1 = createTreeNode(ANOTHER_NODE_DATA);
 		TreeNode<String> mAnotherNode2 = createTreeNode(ANOTHER_NODE_DATA);
-		assertEquals(messageEqual, mAnotherNode1, mAnotherNode2);
-
-		TreeNode<String> mNullNode1 = createTreeNode(null);
-		TreeNode<String> mNullNode2 = createTreeNode(null);
-		assertEquals(messageEqual, mNullNode1, mNullNode2);
-		assertNotEquals(messageNotEqual, mAnotherNode1, mNullNode2);
-		assertNotEquals(messageNotEqual, mNullNode1, mAnotherNode2);
-
-		// Test parent data equality between the current tree node and the specified tree node
-		TreeNode<String> mAnotherNode3 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mAnotherNode4 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mRootNode1 = createTreeNode(ROOT_DATA);
-		mRootNode1.add(mAnotherNode3);
-		mRootNode1.add(mAnotherNode4);
-		assertEquals(messageEqual, mAnotherNode3, mAnotherNode4);
-
-		TreeNode<String> mAnotherNode5 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mAnotherNode6 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mNullRootNode1 = createTreeNode(null);
-		mNullRootNode1.add(mAnotherNode5);
-		mNullRootNode1.add(mAnotherNode6);
-		assertEquals(messageEqual, mAnotherNode5, mAnotherNode6);
-		assertNotEquals(messageNotEqual, mAnotherNode3, mAnotherNode5);
-		assertNotEquals(messageNotEqual, mAnotherNode6, mAnotherNode4);
-
-		TreeNode<String> mRootNode2 = createTreeNode(ROOT_DATA);
-		TreeNode<String> mRootNode3 = createTreeNode(ROOT_DATA);
-		TreeNode<String> mAnotherNode7 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mAnotherNode8 = createTreeNode(ANOTHER_NODE_DATA);
-		mRootNode2.add(mAnotherNode7);
-		mRootNode3.add(mAnotherNode8);
-		assertEquals(messageEqual, mRootNode2, mRootNode3);
+		assertNotEquals(messageNotEqual, mAnotherNode1, mAnotherNode2);
 	}
 
 	@Test
@@ -791,7 +768,7 @@ public abstract class AbstractTreeNodeTest {
 	}
 
 	@Test(expected = NoSuchElementException.class)
-	public void testIteratorNoSuchElementException() {
+	public void testIteratorNextNoSuchElementException() {
 		// Test exception is thrown if there are no tree nodes
 		Iterator<TreeNode<String>> mIterator = root.iterator();
 		while (mIterator.hasNext()) {
@@ -801,7 +778,7 @@ public abstract class AbstractTreeNodeTest {
 	}
 
 	@Test(expected = ConcurrentModificationException.class)
-	public void testConcurrentModificationException() {
+	public void testIteratorNextConcurrentModificationException() {
 		// Test exception is thrown if tree is changed during the iteration without iterator
 		for (TreeNode<String> mNode : root) {
 			if (mNode.equals(node3)) {
@@ -833,28 +810,45 @@ public abstract class AbstractTreeNodeTest {
 		assertEquals(node10, mIterator1.next());
 		mIterator1.remove();
 		assertFalse(messageRemoveExpected, node9.contains(node10));
+		mIterator1.remove();
+		assertFalse(messageRemoveExpected, root.contains(node9));
+	}
 
-		// Test iterator removes the correct tree node in case of identical nodes
-		TreeNode<String> mNode1 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mNode2 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mNode3 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mNode4 = createTreeNode(ANOTHER_NODE_DATA);
-		TreeNode<String> mNode5 = createTreeNode(ANOTHER_NODE_DATA);
-		mNode1.add(mNode2);
-		mNode1.add(mNode3);
-		mNode1.add(mNode4);
-		mNode3.add(mNode5);
-		Iterator<TreeNode<String>> iterator = mNode1.iterator();
-		assertEquals(mNode1, iterator.next());
-		assertEquals(mNode2, iterator.next());
-		assertEquals(mNode3, iterator.next());
-		assertEquals(mNode5, iterator.next());
+	@Test(expected = IllegalStateException.class)
+	public void testIteratorRemoveIllegalStateException() {
+		// Test exception is thrown if the iterator remove was called prior the iteration start
+		Iterator<TreeNode<String>> iterator = node1.iterator();
 		iterator.remove();
-		assertFalse(mNode3.contains(mNode5));
-		assertEquals(mNode4, iterator.next());
-		iterator.remove();
-		assertFalse(mNode1.contains(mNode4));
+	}
 
+	@Test(expected = TreeNodeException.class)
+	public void testIteratorRemoveOnCurrentNodeTreeNodeException() {
+		// Test exception is thrown if iterator remove was called on the top tree node
+		Iterator<TreeNode<String>> iterator = node2.iterator();
+		iterator.next();
+		iterator.remove();
+	}
+
+	@Test(expected = TreeNodeException.class)
+	public void testIteratorRemoveOnRootTreeNodeException() {
+		// Test exception is thrown if iterator remove was called on the root tree node
+		Iterator<TreeNode<String>> iterator = root.iterator();
+		iterator.next();
+		iterator.remove();
+	}
+
+	@Test(expected = ConcurrentModificationException.class)
+	public void testIteratorRemoveConcurrentModificationException() {
+		// Test exception is thrown if tree was changed while calling iterator remove
+		Iterator<TreeNode<String>> iterator = root.iterator();
+		do {
+			if (iterator.next().equals(node7)) {
+				break;
+			}
+		} while (true);
+		iterator.remove();
+//		node2.dropSubtree(node8);
+		iterator.remove();
 	}
 
 }
