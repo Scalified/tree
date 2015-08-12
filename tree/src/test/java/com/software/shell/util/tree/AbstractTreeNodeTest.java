@@ -847,7 +847,7 @@ public abstract class AbstractTreeNodeTest {
 			}
 		} while (true);
 		iterator.remove();
-//		node2.dropSubtree(node8);
+		node2.dropSubtree(node8);
 		iterator.remove();
 	}
 

@@ -850,19 +850,21 @@ public abstract class AbstractTreeNode<T> implements TreeNode<T> {
 				throw new TreeNodeException(errorMessage + "The starting node can't be removed");
 			}
 			checkForConcurrentModification();
-			AbstractTreeNode<T> mParent = (AbstractTreeNode<T>) currentNode;
+			AbstractTreeNode<T> mCurrent = (AbstractTreeNode<T>) currentNode;
 			while (true) {
-				if (mParent.isRoot()) {
+				if (mCurrent.isRoot()) {
 					nextNodeAvailable = false;
 					break;
-				} else if (mParent.nextSibling() != null) {
-					currentNode = nextNode = mParent.nextSibling();
+				} else if (mCurrent.nextSibling() != null) {
+					nextNode = mCurrent.nextSibling();
 					break;
 				} else {
-					mParent = (AbstractTreeNode<T>) mParent.parent();
+					mCurrent = (AbstractTreeNode<T>) mCurrent.parent();
 				}
 			}
-			currentNode.parent().dropSubtree(currentNode);
+			TreeNode<T> mParent = currentNode.parent();
+			mParent.dropSubtree(currentNode);
+			currentNode = mParent;
 			expectedSize = size();
 		}
 
