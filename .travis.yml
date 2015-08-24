@@ -3,7 +3,5 @@ language: java
 jdk:
   - oraclejdk7
 
-before_script:
-  - chmod u+x gradlew
 script:
-  gradle clean build --info
+  - gradle clean check build --info
