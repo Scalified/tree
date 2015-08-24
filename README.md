@@ -1,7 +1,7 @@
 # Tree Data Structure Java Library
 
 [![Build Status](https://travis-ci.org/shell-software/tree.svg)](https://travis-ci.org/shell-software/tree)
-[![Maven Central](https://assets.shields.io/maven-central/v/com.github.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.github.shell-software%22%20AND%20a%3A%22fab%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.github.shell-software%22%20AND%20a%3A%22tree%22)
 
 ## Description
 
@@ -110,7 +110,7 @@ The children of *n1* can be found by following its leftmost-child pointer to *n2
 indeed), therefore *n1* has no more children
 <br>The figure above can be represented in such a way:
 
-![Leftmost-Child-Right-Sibling Representation](https://github.com/shell-software/tree/blob/master/assets/leftmost_child_right_sibling_another_representation.png)
+![Leftmost-Child-Right-Sibling Another Representation](https://github.com/shell-software/tree/blob/master/assets/leftmost_child_right_sibling_another_representation.png)
 
 The downward arrows are the leftmost-child links; the sideways arrows are the right-sibling links
 
@@ -199,8 +199,8 @@ that represent expressions
 
 ## Usage
 
-![**TreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TreeNode.java) 
-- is the top interface, which represents the basic tree data structures. It describes the basic methods, which are 
+[**TreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TreeNode.java) - 
+is the top interface, which represents the basic tree data structures. It describes the basic methods, which are 
 implemented by all the trees
 
 ### Creation
@@ -411,8 +411,8 @@ int height = node.height();
 
 ### K-ary (multinode) Trees
 
-![**MultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/MultiTreeNode.java) 
-- interface, which adds additional methods for multi tree node (K-ary) tree data structures:
+[**MultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/MultiTreeNode.java) - 
+interface, which adds additional methods for multi tree node (K-ary) tree data structures:
 
 ```java
 // Getting the siblings of the current tree node
@@ -436,8 +436,8 @@ boolean resultRemoveSubtrees = node.removeSubtrees(collectionToRemove);
 
 K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 2 implementations:
 
-* ![**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/ArrayMultiTreeNode.java) 
-- implementation based on the array-of-pointers
+* [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/ArrayMultiTreeNode.java) - 
+implementation based on the array-of-pointers
 * LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling
 
 

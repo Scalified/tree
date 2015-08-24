@@ -4,6 +4,6 @@ jdk:
   - oraclejdk7
 
 before_script:
-  - chmod +x gradlew
+  - chmod u+x gradlew
 script:
   gradle clean build --info
