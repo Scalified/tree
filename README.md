@@ -1,11 +1,11 @@
 # Tree Data Structure Java Library
 
 [![Build Status](https://travis-ci.org/shell-software/tree.svg)](https://travis-ci.org/shell-software/tree)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.github.shell-software%22%20AND%20a%3A%22fab%22)
+[![Maven Central](https://assets.shields.io/maven-central/v/com.github.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.github.shell-software%22%20AND%20a%3A%22fab%22)
 
 ## Description
 
-This Library contains different implementations of the tree data structures, such as K-ary, binary, expression tress etc.
+This Library contains different implementations of the tree data structures, such as K-ary, binary, expression trees etc.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ dependencies {
 
 ### 0.2.0:
 
-    1. K-ary (multi node) tree data structure implementation, based on the leftmost-child right-sibling representation
+1. K-ary (multi node) tree data structure implementation, based on the leftmost-child right-sibling representation
     
 ## Theory
 
@@ -84,24 +84,25 @@ pointers to the children of that node
 <br>The *ith* component of the array at a node contains a pointer to the *ith* child of that node. 
 A missing child can be represented by a **null** pointer
 
-![Array-of-Pointers Representation](https://github.com/shell-software/tree/blob/master/img/array_of_pointers_representation.png)
+![Array-of-Pointers Representation](https://github.com/shell-software/tree/blob/master/assets/array_of_pointers_representation.png)
 
-Array-of-Pointers representation makes it possible to quickly access the *ith* child of any node
+**Array-of-Pointers** representation makes it possible to quickly access the *ith* child of any node
 <br>This representation, however, is very wasteful of space when only a few nodes in the tree have many children. 
 In this case, most of the pointers in the arrays will be **null**
-<br>The Library, however, is optimized for using Array-of-Pointers representation likewise it is done in the 
+
+> The Library, however, is optimized for using Array-of-Pointers representation likewise it is done in the 
 **java.util.ArrayList**. The subtrees size grows automatically in case of reaching the limit. Additionally you may
 specify what is called a *branching factor*, that the initial number of subtrees before grow (like *capacity* in 
 the **java.util.ArrayList**)
 
 #### Leftmost-Child—Right-Sibling
 
-In the Leftmost-Child—Right-Sibling representation each node contains a pointer to its leftmost child; a node does 
+In the **Leftmost-Child—Right-Sibling** representation each node contains a pointer to its leftmost child; a node does 
 not have pointers to any of its other children. In order to locate the second and subsequent children of a node *n*, 
 the children link list created, in which each child *c* points to the child of *n* immediately to the right of *c*.
 That node is called the right sibling of *c*
 
-![Leftmost-Child-Right-Sibling Representation](https://github.com/shell-software/tree/blob/master/img/leftmost_child_right_sibling_representation.png)
+![Leftmost-Child-Right-Sibling Representation](https://github.com/shell-software/tree/blob/master/assets/leftmost_child_right_sibling_representation.png)
 
 In the figure above *n3* is the right sibling of *n2*, *n4* is the right sibling of *n3*, and *n4* has no right sibling. 
 The children of *n1* can be found by following its leftmost-child pointer to *n2*, then the right-sibling pointer to 
@@ -109,13 +110,13 @@ The children of *n1* can be found by following its leftmost-child pointer to *n2
 indeed), therefore *n1* has no more children
 <br>The figure above can be represented in such a way:
 
-![Leftmost-Child-Right-Sibling Representation](https://github.com/shell-software/tree/blob/master/img/leftmost_child_right_sibling_another_representation.png)
+![Leftmost-Child-Right-Sibling Representation](https://github.com/shell-software/tree/blob/master/assets/leftmost_child_right_sibling_another_representation.png)
 
 The downward arrows are the leftmost-child links; the sideways arrows are the right-sibling links
 
 ### Recursions on Trees
 
-![Recursion on Trees](https://github.com/shell-software/tree/blob/master/img/recursion_on_trees.png)
+![Recursion on Trees](https://github.com/shell-software/tree/blob/master/assets/recursion_on_trees.png)
 
 #### Traversal
 
@@ -145,17 +146,17 @@ this process of identifying an operator followed by its operands repeated again.
 The next subexpression will be **y = * x d**. This reduces the target expression to **+ a y**, which is lastly 
 converted to just **a + y**
 <br>The remainder of the infix expression **a + y** then is reconstructed by retracing the steps above. Firstly, 
-the y is substituted to **x * d**, changing the target expression to: **a + (x * d)**. And lastly the x is replaced 
+the *y* is substituted to **x * d**, changing the target expression to: **a + (x * d)**. And lastly the *x* is replaced 
 by **− b c** or simply **b − c**. So the target expression now is: **a + ((b − c) * d)** or **a + (b − c) * d**
-<br>The conversion from *postfix* to *infix* expression uses the same algorithm. The only difference is that firstly the 
-operator, which is preceded by the requisite number of operands must be found in order to decompose the *postfix* 
+<br>The conversion from *postfix* to *infix* expression uses the same algorithm. The only difference is that firstly 
+the operator, which is preceded by the requisite number of operands must be found in order to decompose the *postfix* 
 expression
 
 #### Structural Induction
 
 **Structural Induction** is a proof method that is used to prove some statement *S(T)* is true for all trees *T*
 
-![Structural Induction](https://github.com/shell-software/tree/blob/master/img/structural_induction.png)
+![Structural Induction](https://github.com/shell-software/tree/blob/master/assets/structural_induction.png)
 
 For the basis *S(T)* must be shown to be true when *T* consists of a single node. For the induction, *T* is supposed 
 to be a tree with root *r* and children *c1*, *c2*, …, *ck*, for some *k ≥ 1*. If *T1*, *T2*, …, *Tk* are the subtrees 
@@ -182,7 +183,7 @@ expression represented by *T*
 <br>For the basis, *T* consists of a single node. That is, the argument *n* is a (pointer to a) leaf. Since the 
 operator field has the value *‘i’* when the node represents and operand, the function succeeds
 
-![Structural Induction Nodes](https://github.com/shell-software/tree/blob/master/img/structural_induction_nodes.png)
+![Structural Induction Nodes](https://github.com/shell-software/tree/blob/master/assets/structural_induction_nodes.png)
 
 If the node *n* is not a (pointer to a) leaf, the inductive hypothesis is that *S(T’)* is true for each tree *T’* 
 rooted at one of the children of *n*. *S(T)* then must be proved for the tree *T* rooted at *n*
@@ -198,17 +199,20 @@ that represent expressions
 
 ## Usage
 
-**TreeNode** - is the top interface, which represents the basic tree data structures. It describes the basic methods, 
-which are implemented by all the trees
+![**TreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TreeNode.java) 
+- is the top interface, which represents the basic tree data structures. It describes the basic methods, which are 
+implemented by all the trees
 
 ### Creation
 
 Suppose you need to create the following tree with **String** data using array-of-pointer representation:
 
-![K-ary tree](https://github.com/shell-software/tree/blob/master/img/k_ary_tree.png)
+![K-ary tree](https://github.com/shell-software/tree/blob/master/assets/k_ary_tree.png)
+
+The following code snippet shows how to build such tree: 
 
 ```java
-// Firstly create the tree nodes
+// Creating the tree nodes
 TreeNode<String> n1 = new ArrayMultiTreeNode<>("n1");
 TreeNode<String> n2 = new ArrayMultiTreeNode<>("n2");
 TreeNode<String> n3 = new ArrayMultiTreeNode<>("n3");
@@ -217,7 +221,7 @@ TreeNode<String> n5 = new ArrayMultiTreeNode<>("n5");
 TreeNode<String> n6 = new ArrayMultiTreeNode<>("n6");
 TreeNode<String> n7 = new ArrayMultiTreeNode<>("n7");
 
-// And then perform the proper assignment
+// Assigning tree nodes
 n1.add(n2);
 n1.add(n3);
 n1.add(n4);
@@ -283,7 +287,7 @@ TreeNode<String> subtreeToDrop = new ArrayMultiTreeNode<>("subtreeToDrop");
 boolean resultDropSubtree = node.dropSubtree(subtreeToDrop);
 ```
 
-### Search For Presence
+### Checking For Presence
 
 ```java
 // Checking whether the tree node contains the specified node
@@ -317,6 +321,10 @@ node.clear();
 ```
 
 ### Traversal
+
+![TraversalAction](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TraversalAction.java)
+allows to define an action, which has a single method **perform(TreeNode<T>)**. This method is called during traversal
+on each node visited
 
 ```java
 // Creating traversal action
@@ -403,9 +411,34 @@ int height = node.height();
 
 ### K-ary (multinode) Trees
 
+![**MultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/MultiTreeNode.java) 
+- interface, which adds additional methods for multi tree node (K-ary) tree data structures:
+
+```java
+// Getting the siblings of the current tree node
+Collection<? extends MultiTreeNode<String>> siblings = node.siblings
+
+// Checking whether the current tree node has all of the subtrees specified in the collection
+Collection<? extends MultiTreeNode<String>> collectionToCheck;
+// ... collection initialization skipped
+boolean resultHasSubtrees = node.hasSubtrees(collectionToCheck);
+
+// Adding all of the subtrees from the collection to the current tree node
+Collection<? extends MultiTreeNode<String>> collectionToAdd;
+// ... collection initialization skipped
+boolean resultAddSubtrees = node.addSubtrees(collectionToAdd);
+
+// Removing all of the subtrees specified in the collection from the current tree node
+Collection<? extends MultiTreeNode<String>> collectionToRemove;
+// ... collection initialization skipped
+boolean resultRemoveSubtrees = node.removeSubtrees(collectionToRemove);
+```
+
 K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 2 implementations:
-* **ArrayMultiTreeNode** - implementation based on the array-of-pointers
-* **LinkedMultiTreeNode** - implementation based on the leftmost-child-right-sibling
+
+* ![**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/ArrayMultiTreeNode.java) 
+- implementation based on the array-of-pointers
+* LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling
 
 
 ## License
