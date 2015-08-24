@@ -27,7 +27,7 @@ import java.util.*;
 
 /**
  * Implementation of the K-ary (multi node) tree data structure,
- * base on the resizable array
+ * based on the resizable array
  *
  * @author shell
  * @version 1.0.0
