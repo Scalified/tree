@@ -351,8 +351,8 @@ for (TreeNode<String> node : root) {
 }
 
 // Iterating over the tree elements using Iterator
-Iterator<TreeNode<String>> iterator = root.iterator;
-while (iterator.hasNext) {
+Iterator<TreeNode<String>> iterator = root.iterator();
+while (iterator.hasNext()) {
 	TreeNode<String> node = iterator.next();
 }
 ```
