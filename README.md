@@ -322,7 +322,7 @@ node.clear();
 
 ### Traversal
 
-![TraversalAction](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TraversalAction.java)
+[TraversalAction](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TraversalAction.java)
 allows to define an action, which has a single method **perform(TreeNode<T>)**. This method is called during traversal
 on each node visited
 
@@ -416,7 +416,7 @@ interface, which adds additional methods for multi tree node (K-ary) tree data s
 
 ```java
 // Getting the siblings of the current tree node
-Collection<? extends MultiTreeNode<String>> siblings = node.siblings
+Collection<? extends MultiTreeNode<String>> siblings = node.siblings();
 
 // Checking whether the current tree node has all of the subtrees specified in the collection
 Collection<? extends MultiTreeNode<String>> collectionToCheck;
