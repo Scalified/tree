@@ -15,7 +15,7 @@ The Library requires [Oracle Java SE Development Kit 7u80](http://www.oracle.com
 
 ```java
 dependencies {
-	compile 'com.github.shell-software:tree:0.1.0'
+	compile 'com.github.shell-software:tree:0.1.1'
 }
 ```
 
