@@ -16,7 +16,7 @@
  * File created: 2015-07-12 15:48:12
  */
 
-package com.software.shell.util.tree;
+package com.software.shell.tree;
 
 import java.io.Serializable;
 import java.util.Collection;

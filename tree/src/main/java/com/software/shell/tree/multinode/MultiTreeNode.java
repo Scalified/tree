@@ -16,9 +16,9 @@
  * File created: 2015-07-18 13:50:34
  */
 
-package com.software.shell.util.tree.multinode;
+package com.software.shell.tree.multinode;
 
-import com.software.shell.util.tree.TreeNode;
+import com.software.shell.tree.TreeNode;
 
 import java.util.Collection;
 import java.util.Collections;

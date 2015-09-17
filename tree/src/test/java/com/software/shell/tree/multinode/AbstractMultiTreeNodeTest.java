@@ -16,11 +16,11 @@
  * File created: 2015-07-19 18:18:34
  */
 
-package com.software.shell.util.tree.multinode;
+package com.software.shell.tree.multinode;
 
-import com.software.shell.util.tree.AbstractTreeNodeTest;
-import com.software.shell.util.tree.TreeNode;
-import com.software.shell.util.tree.TreeNodeException;
+import com.software.shell.tree.AbstractTreeNodeTest;
+import com.software.shell.tree.TreeNode;
+import com.software.shell.tree.TreeNodeException;
 import org.junit.Test;
 
 import java.util.ArrayList;

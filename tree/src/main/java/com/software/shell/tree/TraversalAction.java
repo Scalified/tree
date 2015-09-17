@@ -16,7 +16,7 @@
  * File created: 2015-07-18 12:12:59
  */
 
-package com.software.shell.util.tree;
+package com.software.shell.tree;
 
 /**
  * An interface, which defines the action to perform while traversing

@@ -16,7 +16,7 @@
  * File created: 2015-07-18 14:05:46
  */
 
-package com.software.shell.util.tree;
+package com.software.shell.tree;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

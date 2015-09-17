@@ -16,11 +16,11 @@
  * File created: 2015-07-18 14:09:41
  */
 
-package com.software.shell.util.tree.multinode;
+package com.software.shell.tree.multinode;
 
-import com.software.shell.util.tree.AbstractTreeNode;
-import com.software.shell.util.tree.TreeNode;
-import com.software.shell.util.tree.TreeNodeException;
+import com.software.shell.tree.AbstractTreeNode;
+import com.software.shell.tree.TreeNode;
+import com.software.shell.tree.TreeNodeException;
 
 import java.util.*;
 

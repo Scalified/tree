@@ -16,7 +16,7 @@
  * File created: 2015-07-19 16:47:12
  */
 
-package com.software.shell.util.tree;
+package com.software.shell.tree;
 
 import org.junit.Before;
 import org.junit.Test;

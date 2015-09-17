@@ -16,12 +16,12 @@
  * File created: 2015-07-12 15:50:33
  */
 
-package com.software.shell.util.tree.multinode;
+package com.software.shell.tree.multinode;
 
-import com.software.shell.util.tree.AbstractTreeNode;
-import com.software.shell.util.tree.TraversalAction;
-import com.software.shell.util.tree.TreeNode;
-import com.software.shell.util.tree.TreeNodeException;
+import com.software.shell.tree.AbstractTreeNode;
+import com.software.shell.tree.TraversalAction;
+import com.software.shell.tree.TreeNode;
+import com.software.shell.tree.TreeNodeException;
 
 import java.util.*;
 
@@ -110,7 +110,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	@Override
 	public AbstractTreeNode<T> firstSubtree() {
 		if (isLeaf()) {
-			String message = String.format("Failed to determine the first subtree. " + NODE_IS_LEAF_MESSAGE, this);
+			String message = String.format("Failed to determine the first subtree. " + AbstractTreeNode.NODE_IS_LEAF_MESSAGE, this);
 			throw new TreeNodeException(message);
 		}
 		return (AbstractTreeNode<T>) subtrees[0];
@@ -205,7 +205,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 			System.arraycopy(subtrees, mSubtreeIndex + 1, subtrees, mSubtreeIndex, mNumShift);
 		}
 		subtrees[--subtreesSize] = null;
-		unAssignParent(subtree);
+		AbstractTreeNode.unAssignParent(subtree);
 		return true;
 	}
 
@@ -277,7 +277,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		if (subtree == null) {
 			return false;
 		}
-		assignParent(subtree, this);
+		AbstractTreeNode.assignParent(subtree, this);
 		ensureSubtreesCapacity(subtreesSize + 1);
 		subtrees[subtreesSize++] = subtree;
 		return true;
@@ -447,7 +447,7 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	@Override
 	public Collection<? extends MultiTreeNode<T>> siblings() {
 		if (isRoot()) {
-			String message = String.format("Unable to find the siblings. " + NODE_IS_ROOT_MESSAGE, root());
+			String message = String.format("Unable to find the siblings. " + AbstractTreeNode.NODE_IS_ROOT_MESSAGE, root());
 			throw new TreeNodeException(message);
 		}
 		ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) parent;
@@ -479,11 +479,11 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	 */
 	@Override
 	public boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
-		if (!isEligible(subtrees)) {
+		if (!AbstractTreeNode.isEligible(subtrees)) {
 			return false;
 		}
 		for (MultiTreeNode<T> mSubtree : subtrees) {
-			assignParent(mSubtree, this);
+			AbstractTreeNode.assignParent(mSubtree, this);
 		}
 		Object[] subtreesArray = subtrees.toArray();
 		int subtreesArrayLength = subtreesArray.length;

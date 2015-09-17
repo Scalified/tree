@@ -16,7 +16,7 @@
  * File created: 2015-07-12 15:48:27
  */
 
-package com.software.shell.util.tree;
+package com.software.shell.tree;
 
 /**
  * The class is responsible for different exceptional cases,
