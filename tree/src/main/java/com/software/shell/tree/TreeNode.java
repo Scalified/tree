@@ -19,7 +19,10 @@
 package com.software.shell.tree;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.software.shell.tree.util.Validator.*;
 
 /**
  * This interface represents the basic tree data structure
@@ -75,49 +78,36 @@ import java.util.Collection;
  * @version 1.0.0
  * @since 1.0.0
  */
-public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Cloneable {
+public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable, Cloneable {
 
 	/**
-	 * Returns the data object stored in the current tree node
-	 *
-	 * @return data object stored in the current tree node
+	 * Identifier generator, used to get a unique id for each created tree node
 	 */
-	T data();
+	private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
 
 	/**
-	 * Stores the data object into the current tree node
-	 *
-	 * @param data data object to store into the current tree node
+	 * A unique identifier, used to distinguish or compare the tree nodes
 	 */
-	void setData(T data);
+	private final long id = ID_GENERATOR.getAndIncrement();
 
 	/**
-	 * Returns the root node of the current node
-	 * <p>
-	 * Returns itself if the current node is root
-	 *
-	 * @return root node of the current node; itself,
-	 *         if the current node is root
+	 * Reference to the parent tree node. Is {@code null} if the current tree node is root
 	 */
-	TreeNode<T> root();
+	protected TreeNode<T> parent;
 
 	/**
-	 * Checks whether the current tree node is the root of the tree
-	 *
-	 * @return {@code true} if the current tree node is root of the tree;
-	 *         {@code false} otherwise
+	 * Data store in the current tree node
 	 */
-	boolean isRoot();
+	protected T data;
 
 	/**
-	 * Returns the parent node of the current node
-	 * <p>
-	 * Returns {@code null} if the current node is root
+	 * Creates an instance of this class
 	 *
-	 * @return parent node of the current node; {@code null}
-	 *         if the current node is root
+	 * @param data data to store in the current tree node
 	 */
-	TreeNode<T> parent();
+	public TreeNode(T data) {
+		this.data = data;
+	}
 
 	/**
 	 * Returns the collection of the child nodes of the current node
@@ -129,66 +119,7 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *         all of its proper descendants, if any;
 	 *         {@code null} if the current node is leaf
 	 */
-	Collection<? extends TreeNode<T>> subtrees();
-
-	/**
-	 * Checks whether the current tree node is a leaf, e.g. does not have any
-	 * subtrees
-	 *
-	 * @return {@code true} if the current tree node is a leaf, e.g. does not
-	 *         have any subtrees; {@code false} otherwise
-	 */
-	boolean isLeaf();
-
-	/**
-	 * Checks whether among the current tree node subtrees there is
-	 * a specified subtree
-	 *
-	 * @param subtree subtree whose presence within the current tree
-	 *                node children is to be checked
-	 * @return {@code true} if among the current tree node subtrees
-	 *         there is a specified subtree; {@code false} otherwise
-	 */
-	boolean hasSubtree(TreeNode<T> subtree);
-
-	/**
-	 * Drops the first occurrence of the specified subtree from the current
-	 * tree node
-	 * <p>
-	 * Checks whether the current tree node was changed as a result of
-	 * the call
-	 *
-	 * @param subtree subtree to drop from the current tree node
-	 * @return {@code true} if the current tree node was changed as a result
-	 *         of the call; {@code false} otherwise
-	 */
-	boolean dropSubtree(TreeNode<T> subtree);
-
-	/**
-	 * Checks whether the current tree node with all of its descendants
-	 * (entire tree) contains the specified node
-	 *
-	 * @param node node whose presence within the current tree node with
-	 *             all of its descendants (entire tree) is to be checked
-	 * @return {@code true} if the current node with all of its descendants
-	 *         (entire tree) contains the specified node; {@code false}
-	 *         otherwise
-	 */
-	boolean contains(TreeNode<T> node);
-
-	/**
-	 * Checks whether the current tree node with all of its descendants
-	 * (entire tree) contains all of the nodes from the specified collection
-	 * (the place of nodes within a tree is not important)
-	 *
-	 * @param nodes collection of nodes to be checked for containment
-	 *              within the current tree node with all of its descendants
-	 *              (entire tree)
-	 * @return {@code true} if the current tree node with all of its
-	 *         descendants (entire tree) contains all of the nodes from the
-	 *         specified collection; {@code false} otherwise
-	 */
-	boolean containsAll(Collection<TreeNode<T>> nodes);
+	public abstract Collection<? extends TreeNode<T>> subtrees();
 
 	/**
 	 * Adds the subtree with all of its descendants to the current tree node
@@ -202,13 +133,178 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return {@code true} if this tree node was changed as a
 	 *         result of the call; {@code false} otherwise
 	 */
-	boolean add(TreeNode<T> subtree);
+	public abstract boolean add(TreeNode<T> subtree);
+
+	/**
+	 * Drops the first occurrence of the specified subtree from the current
+	 * tree node
+	 * <p>
+	 * Checks whether the current tree node was changed as a result of
+	 * the call
+	 *
+	 * @param subtree subtree to drop from the current tree node
+	 * @return {@code true} if the current tree node was changed as a result
+	 *         of the call; {@code false} otherwise
+	 */
+	public abstract boolean dropSubtree(TreeNode<T> subtree);
 
 	/**
 	 * Removes all the subtrees with all of its descendants from the current
 	 * tree node
 	 */
-	void clear();
+	public abstract void clear();
+
+	/**
+	 * Returns an iterator over the elements in this tree in proper sequence
+	 * <p>
+	 * The returned iterator is <b>fail-fast</b>
+	 *
+	 * @return an iterator over the elements in this tree in proper sequence
+	 */
+	public abstract TreeNodeIterator iterator();
+
+	/**
+	 * Returns the data object stored in the current tree node
+	 *
+	 * @return data object stored in the current tree node
+	 */
+	public T data() {
+		return data;
+	}
+
+	/**
+	 * Stores the data object into the current tree node
+	 *
+	 * @param data data object to store into the current tree node
+	 */
+	public void setData(T data) {
+		this.data = data;
+	}
+
+	/**
+	 * Checks whether the current tree node is the root of the tree
+	 *
+	 * @return {@code true} if the current tree node is root of the tree;
+	 *         {@code false} otherwise
+	 */
+	public boolean isRoot() {
+		return parent == null;
+	}
+
+	/**
+	 * Returns the root node of the current node
+	 * <p>
+	 * Returns itself if the current node is root
+	 *
+	 * @return root node of the current node; itself,
+	 *         if the current node is root
+	 */
+	public TreeNode<T> root() {
+		if (isRoot()) {
+			return this;
+		}
+		TreeNode<T> node = this;
+		do {
+			node = node.parent();
+		} while (!node.isRoot());
+		return node;
+	}
+
+	/**
+	 * Returns the parent node of the current node
+	 * <p>
+	 * Returns {@code null} if the current node is root
+	 *
+	 * @return parent node of the current node; {@code null}
+	 *         if the current node is root
+	 */
+	public TreeNode<T> parent() {
+		return parent;
+	}
+
+	/**
+	 * Checks whether the current tree node is a leaf, e.g. does not have any
+	 * subtrees
+	 *
+	 * @return {@code true} if the current tree node is a leaf, e.g. does not
+	 *         have any subtrees; {@code false} otherwise
+	 */
+	public boolean isLeaf() {
+		return subtrees().isEmpty();
+	}
+
+	/**
+	 * Checks whether among the current tree node subtrees there is
+	 * a specified subtree
+	 *
+	 * @param subtree subtree whose presence within the current tree
+	 *                node children is to be checked
+	 * @return {@code true} if among the current tree node subtrees
+	 *         there is a specified subtree; {@code false} otherwise
+	 */
+	public boolean hasSubtree(TreeNode<T> subtree) {
+		if (isNull(subtree)
+				|| isLeaf()
+				|| subtree.isRoot()) {
+			return false;
+		}
+		for (TreeNode<T> mSubtree : subtrees()) {
+			if (mSubtree.equals(subtree)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the current tree node with all of its descendants
+	 * (entire tree) contains the specified node
+	 *
+	 * @param node node whose presence within the current tree node with
+	 *             all of its descendants (entire tree) is to be checked
+	 * @return {@code true} if the current node with all of its descendants
+	 *         (entire tree) contains the specified node; {@code false}
+	 *         otherwise
+	 */
+	public boolean contains(TreeNode<T> node) {
+		if (isNull(node)
+				|| isLeaf()
+				|| node.isRoot()) {
+			return false;
+		}
+		for (TreeNode<T> subtree : subtrees()) {
+			if (subtree.equals(node)
+					|| subtree.contains(node)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the current tree node with all of its descendants
+	 * (entire tree) contains all of the nodes from the specified collection
+	 * (the place of nodes within a tree is not important)
+	 *
+	 * @param nodes collection of nodes to be checked for containment
+	 *              within the current tree node with all of its descendants
+	 *              (entire tree)
+	 * @return {@code true} if the current tree node with all of its
+	 *         descendants (entire tree) contains all of the nodes from the
+	 *         specified collection; {@code false} otherwise
+	 */
+	public boolean containsAll(Collection<TreeNode<T>> nodes) {
+		if (isLeaf()
+				|| areAllNulls(nodes)) {
+			return false;
+		}
+		for (TreeNode<T> node : nodes) {
+			if (!contains(node)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Removes the first occurrence of the specified node from the entire tree,
@@ -220,7 +316,22 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return {@code true} if the current tree node was changed as a result of
 	 *         the call; {@code false} otherwise
 	 */
-	boolean remove(TreeNode<T> node);
+	public boolean remove(TreeNode<T> node) {
+		if (isNull(node)
+				|| isLeaf()
+				|| node.isRoot()) {
+			return false;
+		}
+		if (dropSubtree(node)) {
+			return true;
+		}
+		for (TreeNode<T> subtree : subtrees()) {
+			if (subtree.remove(node)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Removes all of the collection's nodes from the entire tree, starting from
@@ -232,7 +343,20 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return {@code true} if the current tree node was changed as a result
 	 *         of the call; {@code false} otherwise
 	 */
-	boolean removeAll(Collection<TreeNode<T>> nodes);
+	public boolean removeAll(Collection<TreeNode<T>> nodes) {
+		if (isLeaf()
+				|| areAllNulls(nodes)) {
+			return false;
+		}
+		boolean result = false;
+		for (TreeNode<T> node : nodes) {
+			boolean currentResult = remove(node);
+			if (!result && currentResult) {
+				result = true;
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Traverses the tree in a pre ordered manner starting from the
@@ -242,7 +366,14 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @param action action, which is to be performed on each tree
 	 *               node, while traversing the tree
 	 */
-	void traversePreOrder(TraversalAction<TreeNode<T>> action);
+	public void traversePreOrder(TraversalAction<TreeNode<T>> action) {
+		action.perform(this);
+		if (!isLeaf()) {
+			for (TreeNode<T> subtree : subtrees()) {
+				subtree.traversePreOrder(action);
+			}
+		}
+	}
 
 	/**
 	 * Traverses the tree in a post ordered manner starting from the
@@ -252,21 +383,48 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @param action action, which is to be performed on each tree
 	 *               node, while traversing the tree
 	 */
-	void traversePostOrder(TraversalAction<TreeNode<T>> action);
+	public void traversePostOrder(TraversalAction<TreeNode<T>> action) {
+		if (!isLeaf()) {
+			for (TreeNode<T> subtree : subtrees()) {
+				subtree.traversePostOrder(action);
+			}
+		}
+		action.perform(this);
+	}
 
 	/**
 	 * Returns the pre ordered collection of nodes of the current tree
+	 * starting from the current tree node
 	 *
-	 * @return pre ordered collection of nodes of the current tree
+	 * @return pre ordered collection of nodes of the current tree starting
+	 *         from the current tree node
 	 */
-	Collection<? extends TreeNode<T>> preOrdered();
+	public Collection<TreeNode<T>> preOrdered() {
+		if (isLeaf()) {
+			return Collections.singletonList(this);
+		}
+		final Collection<TreeNode<T>> mPreOrdered = new ArrayList<>();
+		TraversalAction<TreeNode<T>> action = populateAction(mPreOrdered);
+		traversePreOrder(action);
+		return mPreOrdered;
+	}
 
 	/**
 	 * Returns the post ordered collection of nodes of the current tree
+	 * starting from the current tree node
 	 *
-	 * @return post ordered collection of nodes of the current tree
+	 * @return post ordered collection of nodes of the current tree starting
+	 *         from the current tree node
 	 */
-	Collection<? extends TreeNode<T>> postOrdered();
+	public Collection<TreeNode<T>> postOrdered() {
+		if (isLeaf()) {
+			return Collections.singletonList(this);
+		}
+		final Collection<TreeNode<T>> mPostOrdered = new ArrayList<>();
+		TraversalAction<TreeNode<T>> action = populateAction(mPostOrdered);
+		traversePostOrder(action);
+		return mPostOrdered;
+	}
 
 	/**
 	 * Returns the collection of nodes, which connect the current node
@@ -278,7 +436,31 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *                           current node does not have such descendant or if the
 	 *                           specified tree node is root
 	 */
-	Collection<? extends TreeNode<T>> path(TreeNode<T> descendant);
+	public Collection<? extends TreeNode<T>> path(TreeNode<T> descendant) {
+		if (isNull(descendant)
+				|| isLeaf()
+				|| this.equals(descendant)) {
+			return Collections.singletonList(this);
+		}
+		String errorMessage = "Unable to build the path between tree nodes. ";
+		if (descendant.isRoot()) {
+			String message = String.format(errorMessage + "Current node %1$s is root", descendant);
+			throw new TreeNodeException(message);
+		}
+		List<TreeNode<T>> path = new LinkedList<>();
+		TreeNode<T> node = descendant;
+		path.add(node);
+		do {
+			node = node.parent();
+			path.add(0, node);
+			if (this.equals(node)) {
+				return path;
+			}
+		} while (!node.isRoot());
+		String message = String.format(errorMessage +
+				"The specified tree node %1$s is not the descendant of tree node %2$s", descendant, this);
+		throw new TreeNodeException(message);
+	}
 
 	/**
 	 * Returns the common ancestor of the current node and the node specified
@@ -291,7 +473,30 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *                          does not belong to the current tree or if any of the tree
 	 *                          nodes either the current one or the specified one is root
 	 */
-	TreeNode<T> commonAncestor(TreeNode<T> node);
+	public TreeNode<T> commonAncestor(TreeNode<T> node) {
+		String errorMessage = "Unable to find the common ancestor between tree nodes. ";
+		if (isNull(node)) {
+			String message = errorMessage + "The specified tree node is null";
+			throw new TreeNodeException(message);
+		}
+		if (!this.root().contains(node)) {
+			String message = String.format(errorMessage +
+					"The specified tree node %1$s was not found in the current tree node %2$s", node, this);
+			throw new TreeNodeException(message);
+		}
+		if (this.isRoot()
+				|| node.isRoot()) {
+			String message = String.format(errorMessage + "The tree node %1$s is root", this.isRoot() ? this : node);
+			throw new TreeNodeException(message);
+		}
+		if (this.equals(node)
+				|| node.isSiblingOf(this)) {
+			return parent();
+		}
+		int thisNodeLevel = this.level();
+		int thatNodeLevel = node.level();
+		return thisNodeLevel > thatNodeLevel ? node.parent() : this.parent();
+	}
 
 	/**
 	 * Checks whether the current tree node is a sibling of the specified node,
@@ -303,7 +508,12 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *         node, e.g. whether the current tree node and the specified one both
 	 *         have the same parent; {@code false} otherwise
 	 */
-	boolean isSiblingOf(TreeNode<T> node);
+	public boolean isSiblingOf(TreeNode<T> node) {
+		return isNotNull(node)
+				&& !isRoot()
+				&& !node.isRoot()
+				&& this.parent().equals(node.parent());
+	}
 
 	/**
 	 * Checks whether the current tree node is the ancestor of the node specified
@@ -313,7 +523,22 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return {@code true} if the current tree node is the ancestor of the node
 	 *         specified; {@code false} otherwise
 	 */
-	boolean isAncestorOf(TreeNode<T> node);
+	public boolean isAncestorOf(TreeNode<T> node) {
+		if (isNull(node)
+				|| isLeaf()
+				|| node.isRoot()
+				|| this.equals(node)) {
+			return false;
+		}
+		TreeNode<T> mNode = node;
+		do {
+			mNode = mNode.parent();
+			if (this.equals(mNode)) {
+				return true;
+			}
+		} while (!mNode.isRoot());
+		return false;
+	}
 
 	/**
 	 * Checks whether the current tree node is the descendant of the node specified
@@ -323,14 +548,42 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return {@code true} if the current tree node is the ancestor of the node
 	 *         specified; {@code false} otherwise
 	 */
-	boolean isDescendantOf(TreeNode<T> node);
+	public boolean isDescendantOf(TreeNode<T> node) {
+		if (isNull(node)
+				|| this.isRoot()
+				|| node.isLeaf()
+				|| this.equals(node)) {
+			return false;
+		}
+		TreeNode<T> mNode = this;
+		do {
+			mNode = mNode.parent();
+			if (node.equals(mNode)) {
+				return true;
+			}
+		} while (!mNode.isRoot());
+		return false;
+	}
 
 	/**
 	 * Returns the number of nodes in the entire tree, including the current tree node
 	 *
 	 * @return number of nodes in the entire tree, including the current tree node
 	 */
-	long size();
+	public long size() {
+		if (isLeaf()) {
+			return 1;
+		}
+		final long[] count = {0};
+		TraversalAction<TreeNode<T>> action = new TraversalAction<TreeNode<T>>() {
+			@Override
+			public void perform(TreeNode<T> node) {
+				count[0]++;
+			}
+		};
+		traversePreOrder(action);
+		return count[0];
+	}
 
 	/**
 	 * Returns the height of the current tree node, e.g. the number of edges
@@ -339,7 +592,16 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 * @return height of the current tree node, e.g. the number of edges
 	 * on the longest downward path between that node and a leaf
 	 */
-	int height();
+	public int height() {
+		if (isLeaf()) {
+			return 0;
+		}
+		int height = 0;
+		for (TreeNode<T> subtree : subtrees()) {
+			height = Math.max(height, subtree.height());
+		}
+		return height + 1;
+	}
 
 	/**
 	 * Returns the depth (level) of the current tree node within the entire tree,
@@ -349,13 +611,336 @@ public interface TreeNode<T> extends Iterable<TreeNode<T>>, Serializable, Clonea
 	 *         e.g. the number of edges between the root tree node and the current
 	 *         one
 	 */
-	int level();
+	public int level() {
+		if (isRoot()) {
+			return 0;
+		}
+		int level = 0;
+		TreeNode<T> node = this;
+		do {
+			node = node.parent();
+			level++;
+		} while (!node.isRoot());
+		return level;
+	}
 
 	/**
 	 * Creates and returns a copy of this object
 	 *
 	 * @return a clone of this instance
 	 */
-	TreeNode<T> clone();
+	@SuppressWarnings("unchecked")
+	@Override
+	public TreeNode<T> clone() {
+		try {
+			return (TreeNode<T>) super.clone();
+		} catch (CloneNotSupportedException e) {
+			String message = "Unable to clone the current tree node";
+			throw new TreeNodeException(message, e);
+		}
+	}
+
+	/**
+	 * Indicates whether some object equals to this one
+	 *
+	 * @param obj the reference object with which to compare
+	 * @return {@code true} if this object is the same as the obj
+	 *         argument; {@code false} otherwise
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (isNull(obj)
+				|| getClass() != obj.getClass()) {
+			return false;
+		}
+		TreeNode<T> that = (TreeNode<T>) obj;
+		return this.id == that.id;
+	}
+
+	/**
+	 * Returns the hash code value of this object
+	 *
+	 * @return hash code value of this object
+	 */
+	@Override
+	public int hashCode() {
+		return (int) (this.id ^ (this.id >>> 32));
+	}
+
+	/**
+	 * Returns the string representation of this object
+	 *
+	 * @return string representation of this object
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("\n");
+		final int topNodeLevel = level();
+		TraversalAction<TreeNode<T>> action = new TraversalAction<TreeNode<T>>() {
+			@Override
+			public void perform(TreeNode<T> node) {
+				int nodeLevel = node.level() - topNodeLevel;
+				for (int i = 0; i < nodeLevel; i++) {
+					builder.append("|  ");
+				}
+				builder
+						.append("+- ")
+						.append(node.data())
+						.append("\n");
+			}
+		};
+		traversePreOrder(action);
+		return builder.toString();
+	}
+
+	/**
+	 * Populates the input collection with the tree nodes, while traversing the tree
+	 *
+	 * @param collection input collection to populate
+	 * @param <T> type of the tree node
+	 * @return traversal action, which populates the input collection with the tree nodes
+	 */
+	protected static <T> TraversalAction<TreeNode<T>> populateAction(final Collection<TreeNode<T>> collection) {
+		return new TraversalAction<TreeNode<T>>() {
+			@Override
+			public void perform(TreeNode<T> node) {
+				collection.add(node);
+			}
+		};
+	}
+
+	/**
+	 * Assigns the specified parent tree node reference as the parent to the
+	 * specified tree node
+	 *
+	 * @param node tree node to assign the parent tree node reference to
+	 * @param parent tree node to assign as a parent reference
+	 * @param <T> type of the data stored in the tree nodes
+	 */
+	protected static <T> void assignParent(TreeNode<T> node, TreeNode<T> parent) {
+		if (isNotNull(node)) {
+			node.parent = parent;
+		}
+	}
+
+	/**
+	 * Removes the parent tree node reference from the specified tree node
+	 *
+	 * @param node tree node to remove the parent tree node reference assignment from
+	 * @param <T> type of the data store in the tree node
+	 */
+	protected static <T> void removeParentAssignment(TreeNode<T> node) {
+		node.parent = null;
+	}
+
+	/**
+	 * Base tree node iterator, which is expected to be extended by {@link TreeNode}
+	 * subclasses in order to perform custom implementation and return it in
+	 * {@link #iterator()}
+	 */
+	protected abstract class TreeNodeIterator implements Iterator<TreeNode<T>> {
+
+		/**
+		 * An expected size of the tree node required to check
+		 * whether the tree node was changed during <b>foreach</b>
+		 * iteration
+		 */
+		private long expectedSize = size();
+
+		/**
+		 * Reference to the current tree node within iteration
+		 */
+		private TreeNode<T> currentNode;
+
+		/**
+		 * Reference to the next tree node within iteration
+		 */
+		private TreeNode<T> nextNode = TreeNode.this;
+
+		/**
+		 * Indicates whether there is a next tree node available
+		 * within iteration
+		 */
+		private boolean nextNodeAvailable = true;
+
+		/**
+		 * Returns the leftmost node of the current tree node if the
+		 * current tree node is not a leaf
+		 *
+		 * @return leftmost node of the current tree node if the current
+		 *         tree node is not a leaf
+		 * @throws TreeNodeException an exception that is thrown in case
+		 *                           if the current tree node is a leaf
+		 */
+		protected abstract TreeNode<T> leftMostNode();
+
+		/**
+		 * Returns the right sibling node of the current tree node if the
+		 * current tree node is not root
+		 *
+		 * @return right sibling node of the current tree node if the current
+		 *         tree node is not root
+		 * @throws TreeNodeException an exception that may be thrown in case if
+		 *                           the current tree node is root
+		 */
+		protected abstract TreeNode<T> rightSiblingNode();
+
+		/**
+		 * Checks whether the current tree node is not a leaf and returns the
+		 * leftmost node from {@link #leftMostNode()}
+		 *
+		 * @return leftmost node of the current tree node if the current tree
+		 *         node is not a leaf
+		 * @throws TreeNodeException an exception that is thrown in case
+		 *                           if the current tree node is a leaf
+		 */
+		private TreeNode<T> checkAndGetLeftMostNode() {
+			if (isLeaf()) {
+				throw new TreeNodeException("Leftmost node can't be obtained. Current tree node is a leaf");
+			} else {
+				return leftMostNode();
+			}
+		}
+
+		/**
+		 * Checks whether the current tree node is not root and returns the
+		 * right sibling node from {@link #rightSiblingNode()}
+		 *
+		 * @return right sibling node of the current tree node if the current
+		 *         tree node is not root
+		 * @throws TreeNodeException an exception that may be thrown in case if
+		 *                           the current tree node is root
+		 */
+		private TreeNode<T> checkAndGetRightSiblingNode() {
+			if (isRoot()) {
+				throw new TreeNodeException("Right sibling node can't be obtained. Current tree node is root");
+			} else {
+				return rightSiblingNode();
+			}
+		}
+
+		/**
+		 * Returns {@code true} if the iteration has more elements;
+		 * otherwise returns {@code false}
+		 *
+		 * @return {@code true} if the iteration has more elements;
+		 *         {@code false} otherwise
+		 */
+		@Override
+		public boolean hasNext() {
+			return nextNodeAvailable;
+		}
+
+		/**
+		 * Returns the next element in the iteration
+		 *
+		 * @return the next element in the iteration
+		 * @throws NoSuchElementException if the iteration has no more elements
+		 */
+		@Override
+		public TreeNode<T> next() {
+			checkForConcurrentModification();
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			currentNode = nextNode;
+			if (nextNode.isLeaf()) {
+				if (nextNode.isRoot()) {
+					nextNodeAvailable = false;
+				} else {
+					do {
+						TreeNode<T> currentNode = nextNode;
+						nextNode = nextNode.parent();
+						if (currentNode.equals(TreeNode.this)) {
+							nextNodeAvailable = false;
+							break;
+						}
+						TreeNode<T> nextSibling = currentNode.iterator().checkAndGetRightSiblingNode();
+						if (nextSibling != null) {
+							nextNode = nextSibling;
+							break;
+						}
+					} while (true);
+				}
+			} else {
+				nextNode = nextNode.iterator().checkAndGetLeftMostNode();
+			}
+			return currentNode;
+		}
+
+		/**
+		 * Checks whether tree node was changed during <b>foreach</b>
+		 * iteration and throws {@link ConcurrentModificationException}
+		 * exception if so
+		 */
+		private void checkForConcurrentModification() {
+			if (expectedSize != size()) {
+				throw new ConcurrentModificationException();
+			}
+		}
+
+		/**
+		 * Removes from the underlying tree the last element returned by this
+		 * iterator (optional operation)
+		 * <p>
+		 * This method can be called only once per call to {@link #next}.
+		 * The behavior of an iterator is unspecified if the underlying tree
+		 * is modified while the iteration is in progress in any way other
+		 * than by calling this method
+		 *
+		 * @throws IllegalStateException an exception that may be thrown in case
+		 *                               if remove was performed without any
+		 *                               iteration
+		 * @throws TreeNodeException an exception that may be thrown in case if
+		 *                           remove was performed on a root node
+		 */
+		@Override
+		public void remove() {
+			String errorMessage = "Failed to remove the tree node. ";
+			if (!isIterationStarted()) {
+				throw new IllegalStateException(errorMessage + "The iteration has not been performed yet");
+			}
+			if (currentNode.isRoot()) {
+				String message = String.format(errorMessage + "The tree node %1$s is root", currentNode);
+				throw new TreeNodeException(message);
+			}
+			if (currentNode.equals(TreeNode.this)) {
+				throw new TreeNodeException(errorMessage + "The starting node can't be removed");
+			}
+			checkForConcurrentModification();
+			TreeNode<T> currentNode = this.currentNode;
+			while (true) {
+				if (currentNode.isRoot()) {
+					nextNodeAvailable = false;
+					break;
+				}
+				TreeNode<T> rightSiblingNode = currentNode.iterator().checkAndGetRightSiblingNode();
+				if (isNotNull(rightSiblingNode)) {
+					nextNode = rightSiblingNode;
+					break;
+				}
+				currentNode = currentNode.parent;
+			}
+			TreeNode<T> parent = this.currentNode.parent();
+			parent.dropSubtree(this.currentNode);
+			this.currentNode = parent;
+			expectedSize = size();
+		}
+
+		/**
+		 * Returns whether iteration has been started
+		 *
+		 * @return {@code true} if iteration has been started; {@code false} otherwise
+		 */
+		private boolean isIterationStarted() {
+			return isNotNull(currentNode);
+		}
+
+	}
 
 }

@@ -19,12 +19,16 @@
 package com.software.shell.tree.multinode;
 
 import com.software.shell.tree.TreeNode;
+import com.software.shell.tree.TreeNodeException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import static com.software.shell.tree.util.Validator.*;
+
 /**
- * This interface represents the K-ary (multiple node) tree data
+ * This class represents the K-ary (multiple node) tree data
  * structure
  * <h1>Definition</h1>
  * <p>
@@ -34,19 +38,16 @@ import java.util.Collections;
  * @version 1.0.0
  * @since 1.0.0
  */
-public interface MultiTreeNode<T> extends TreeNode<T> {
+public abstract class MultiTreeNode<T> extends TreeNode<T> {
 
 	/**
-	 * Returns the collection of nodes, which have the same parent
-	 * as the current node; {@link Collections#emptyList()} if the current
-	 * tree node is root or if the current tree node has no subtrees
+	 * Creates an instance of this class
 	 *
-	 * @return collection of nodes, which have the same parent as
-	 *         the current node; {@link Collections#emptyList()} if the
-	 *         current tree node is root or if the current tree node has
-	 *         no subtrees
+	 * @param data data to store in the current tree node
 	 */
-	Collection<? extends MultiTreeNode<T>> siblings();
+	public MultiTreeNode(T data) {
+		super(data);
+	}
 
 	/**
 	 * Adds the collection of the subtrees with all of theirs descendants
@@ -59,7 +60,36 @@ public interface MultiTreeNode<T> extends TreeNode<T> {
 	 * @return {@code true} if this tree node was changed as a
 	 *         result of the call; {@code false} otherwise
 	 */
-	boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees);
+	public abstract boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees);
+
+	/**
+	 * Returns the collection of nodes, which have the same parent
+	 * as the current node; {@link Collections#emptyList()} if the current
+	 * tree node is root or if the current tree node has no subtrees
+	 *
+	 * @return collection of nodes, which have the same parent as
+	 *         the current node; {@link Collections#emptyList()} if the
+	 *         current tree node is root or if the current tree node has
+	 *         no subtrees
+	 */
+	public Collection<? extends MultiTreeNode<T>> siblings() {
+		if (isRoot()) {
+			String message = String.format("Unable to find the siblings. The tree node %1$s is root", root());
+			throw new TreeNodeException(message);
+		}
+		Collection<? extends TreeNode<T>> parentSubtrees = parent.subtrees();
+		int parentSubtreesSize = parentSubtrees.size();
+		if (parentSubtreesSize == 1) {
+			return Collections.<MultiTreeNode<T>> emptyList();
+		}
+		Collection<MultiTreeNode<T>> siblings = new ArrayList<>(parentSubtreesSize - 1);
+		for (TreeNode<T> parentSubtree : parentSubtrees) {
+			if (!parentSubtree.equals(this)) {
+				siblings.add((MultiTreeNode<T>) parentSubtree);
+			}
+		}
+		return siblings;
+	}
 
 	/**
 	 * Checks whether among the current tree node subtrees there are
@@ -71,7 +101,18 @@ public interface MultiTreeNode<T> extends TreeNode<T> {
 	 *         there are all of the subtrees from the specified collection;
 	 *         {@code false} otherwise
 	 */
-	boolean hasSubtrees(Collection<? extends MultiTreeNode<T>> subtrees);
+	public boolean hasSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
+		if (isLeaf()
+				|| areAllNulls(subtrees)) {
+			return false;
+		}
+		for (MultiTreeNode<T> subtree : subtrees) {
+			if (!this.hasSubtree(subtree)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Removes all of the collection's subtrees from the current tree node
@@ -84,6 +125,19 @@ public interface MultiTreeNode<T> extends TreeNode<T> {
 	 * @return {@code true} if the current tree node was changed as a result
 	 *         of the call; {@code false} otherwise
 	 */
-	boolean dropSubtrees(Collection<? extends MultiTreeNode<T>> subtrees);
+	public boolean dropSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
+		if (isLeaf()
+				|| areAllNulls(subtrees)) {
+			return false;
+		}
+		boolean result = false;
+		for (MultiTreeNode<T> subtree : subtrees) {
+			boolean currentResult = dropSubtree(subtree);
+			if (!result && currentResult) {
+				result = true;
+			}
+		}
+		return result;
+	}
 
 }

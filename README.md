@@ -1,7 +1,7 @@
 # Tree Data Structure Java Library
 
 [![Build Status](https://travis-ci.org/shell-software/tree.svg)](https://travis-ci.org/shell-software/tree)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.github.shell-software%22%20AND%20a%3A%22tree%22)
+[![Maven Central](https://img.shields.io/maven-central/v/com.shell-software/tree.svg)](http://search.maven.org/#search|gav|1|g%3A%22com.shell-software%22%20AND%20a%3A%22tree%22)
 
 ## Description
 
@@ -15,7 +15,7 @@ The Library requires [Oracle Java SE Development Kit 7u80](http://www.oracle.com
 
 ```java
 dependencies {
-	compile 'com.github.shell-software:tree:0.1.1'
+	compile 'com.shell-software:tree:0.1.1'
 }
 ```
 
@@ -443,7 +443,7 @@ K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 
 
 * [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/ArrayMultiTreeNode.java) - 
 implementation based on the array-of-pointers
-* LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling
+* LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling representation
 
 
 ## License

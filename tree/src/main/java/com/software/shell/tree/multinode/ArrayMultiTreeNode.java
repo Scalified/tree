@@ -18,12 +18,13 @@
 
 package com.software.shell.tree.multinode;
 
-import com.software.shell.tree.AbstractTreeNode;
 import com.software.shell.tree.TraversalAction;
 import com.software.shell.tree.TreeNode;
 import com.software.shell.tree.TreeNodeException;
 
 import java.util.*;
+
+import static com.software.shell.tree.util.Validator.*;
 
 /**
  * Implementation of the K-ary (multi node) tree data structure,
@@ -33,7 +34,7 @@ import java.util.*;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
+public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 
 	/**
 	 * Current UID of this object used for serialization
@@ -98,25 +99,6 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	}
 
 	/**
-	 * Returns the first subtree of the current tree node if the current
-	 * tree node is not a leaf
-	 *
-	 * @return first subtree of the current tree node if the current tree
-	 *         node is not a leaf
-	 * @throws TreeNodeException an exception that is thrown in case if the
-	 *                           current tree node is leaf
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public AbstractTreeNode<T> firstSubtree() {
-		if (isLeaf()) {
-			String message = String.format("Failed to determine the first subtree. " + AbstractTreeNode.NODE_IS_LEAF_MESSAGE, this);
-			throw new TreeNodeException(message);
-		}
-		return (AbstractTreeNode<T>) subtrees[0];
-	}
-
-	/**
 	 * Returns the collection of the child nodes of the current node
 	 * with all of its proper descendants, if any
 	 * <p>
@@ -128,136 +110,16 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<TreeNode<T>> subtrees() {
+	public Collection<? extends TreeNode<T>> subtrees() {
 		if (isLeaf()) {
 			return Collections.<TreeNode<T>>singletonList(this);
 		}
-		Collection<TreeNode<T>> mSubtrees = new ArrayList<>(subtreesSize);
+		Collection<TreeNode<T>> subtrees = new ArrayList<>(subtreesSize);
 		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			mSubtrees.add(mSubtree);
+			TreeNode<T> subtree = (TreeNode<T>) this.subtrees[i];
+			subtrees.add(subtree);
 		}
-		return mSubtrees;
-	}
-
-	/**
-	 * Checks whether the current tree node is a leaf, e.g. does not have any
-	 * subtrees
-	 * <p>
-	 * Overridden to have a faster array implementation
-	 *
-	 * @return {@code true} if the current tree node is a leaf, e.g. does not
-	 *         have any subtrees; {@code false} otherwise
-	 */
-	@Override
-	public boolean isLeaf() {
-		return subtreesSize == 0;
-	}
-
-	/**
-	 * Checks whether among the current tree node subtrees there is
-	 * a specified subtree
-	 * <p>
-	 * Overridden to have a faster array implementation
-	 *
-	 * @param subtree subtree whose presence within the current tree
-	 *                node children is to be checked
-	 * @return {@code true} if among the current tree node subtrees
-	 *         there is a specified subtree; {@code false} otherwise
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean hasSubtree(TreeNode<T> subtree) {
-		if (isLeaf() || subtree == null ||subtree.isRoot()) {
-			return false;
-		}
-		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			if (subtree.equals(mSubtree)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Drops the first occurrence of the specified subtree from the current
-	 * tree node
-	 * <p>
-	 * Checks whether the current tree node was changed as a result of
-	 * the call
-	 *
-	 * @param subtree subtree to drop from the current tree node
-	 * @return {@code true} if the current tree node was changed as a result
-	 *         of the call; {@code false} otherwise
-	 */
-	@Override
-	public boolean dropSubtree(TreeNode<T> subtree) {
-		if (isLeaf() || subtree == null || subtree.isRoot()) {
-			return false;
-		}
-		int mSubtreeIndex = indexOf(subtree);
-		if (mSubtreeIndex < 0) {
-			return false;
-		}
-		int mNumShift = subtreesSize - mSubtreeIndex - 1;
-		if (mNumShift > 0) {
-			System.arraycopy(subtrees, mSubtreeIndex + 1, subtrees, mSubtreeIndex, mNumShift);
-		}
-		subtrees[--subtreesSize] = null;
-		AbstractTreeNode.unAssignParent(subtree);
-		return true;
-	}
-
-	/**
-	 * Returns the index of the first occurrence of the specified subtree
-	 * within subtrees array; {@code -1} if the subtrees array does not contain
-	 * such subtree
-	 *
-	 * @param subtree subtree to find the index of
-	 * @return index of the first occurrence of the specified subtree within
-	 *         subtrees array; {@code -1} if the subtrees array does not contain
-	 *         such subtree
-	 */
-	@SuppressWarnings("unchecked")
-	private int indexOf(TreeNode<T> subtree) {
-		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			if (mSubtree.equals(subtree)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Checks whether the current tree node with all of its descendants
-	 * (entire tree) contains the specified node
-	 * <p>
-	 * Overridden to have a faster array implementation
-	 *
-	 * @param node node whose presence within the current tree node with
-	 *             all of its descendants (entire tree) is to be checked
-	 * @return {@code true} if the current node with all of its descendants
-	 *         (entire tree) contains the specified node; {@code false}
-	 *         otherwise
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean contains(TreeNode<T> node) {
-		if (isLeaf() || node == null || node.isRoot()) {
-			return false;
-		}
-		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			if (mSubtree.equals(node)) {
-				return true;
-			}
-			if (mSubtree.contains(node)) {
-				return true;
-			}
-		}
-		return false;
+		return subtrees;
 	}
 
 	/**
@@ -274,10 +136,10 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	 */
 	@Override
 	public boolean add(TreeNode<T> subtree) {
-		if (subtree == null) {
+		if (isNull(subtree)) {
 			return false;
 		}
-		AbstractTreeNode.assignParent(subtree, this);
+		assignParent(subtree, this);
 		ensureSubtreesCapacity(subtreesSize + 1);
 		subtrees[subtreesSize++] = subtree;
 		return true;
@@ -319,17 +181,187 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	}
 
 	/**
+	 * Drops the first occurrence of the specified subtree from the current
+	 * tree node
+	 * <p>
+	 * Checks whether the current tree node was changed as a result of
+	 * the call
+	 *
+	 * @param subtree subtree to drop from the current tree node
+	 * @return {@code true} if the current tree node was changed as a result
+	 *         of the call; {@code false} otherwise
+	 */
+	@Override
+	public boolean dropSubtree(TreeNode<T> subtree) {
+		if (isNull(subtree)
+				|| isLeaf()
+				|| subtree.isRoot()) {
+			return false;
+		}
+		int mSubtreeIndex = indexOf(subtree);
+		if (mSubtreeIndex < 0) {
+			return false;
+		}
+		int mNumShift = subtreesSize - mSubtreeIndex - 1;
+		if (mNumShift > 0) {
+			System.arraycopy(subtrees, mSubtreeIndex + 1, subtrees, mSubtreeIndex, mNumShift);
+		}
+		subtrees[--subtreesSize] = null;
+		removeParentAssignment(subtree);
+		return true;
+	}
+
+	/**
+	 * Returns the index of the first occurrence of the specified subtree
+	 * within subtrees array; {@code -1} if the subtrees array does not contain
+	 * such subtree
+	 *
+	 * @param subtree subtree to find the index of
+	 * @return index of the first occurrence of the specified subtree within
+	 *         subtrees array; {@code -1} if the subtrees array does not contain
+	 *         such subtree
+	 */
+	@SuppressWarnings("unchecked")
+	private int indexOf(TreeNode<T> subtree) {
+		for (int i = 0; i < subtreesSize; i++) {
+			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
+			if (mSubtree.equals(subtree)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * Removes all the subtrees with all of its descendants from the current
 	 * tree node
 	 */
 	@Override
 	public void clear() {
 		if (!isLeaf()) {
-			for (int i = 0; i < subtreesSize; i++) {
-				subtrees[i] = null;
-			}
+			subtrees = new Object[branchingFactor];
 			subtreesSize = 0;
 		}
+	}
+
+	/**
+	 * Returns an iterator over the elements in this tree in proper sequence
+	 * <p>
+	 * The returned iterator is <b>fail-fast</b>
+	 *
+	 * @return an iterator over the elements in this tree in proper sequence
+	 */
+	@Override
+	public TreeNodeIterator iterator() {
+		return new TreeNodeIterator() {
+
+			/**
+			 * Returns the leftmost node of the current tree node if the
+			 * current tree node is not a leaf
+			 *
+			 * @return leftmost node of the current tree node if the current
+			 *         tree node is not a leaf
+			 * @throws TreeNodeException an exception that is thrown in case
+			 *                           if the current tree node is a leaf
+			 */
+			@SuppressWarnings("unchecked")
+			@Override
+			protected TreeNode<T> leftMostNode() {
+				return (TreeNode<T>) subtrees[0];
+			}
+
+			/**
+			 * Returns the right sibling node of the current tree node if the
+			 * current tree node is not root
+			 *
+			 * @return right sibling node of the current tree node if the current
+			 *         tree node is not root
+			 * @throws TreeNodeException an exception that may be thrown in case if
+			 *                           the current tree node is root
+			 */
+			@Override
+			@SuppressWarnings("unchecked")
+			protected TreeNode<T> rightSiblingNode() {
+				ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) parent;
+				int rightSiblingNodeIndex = mParent.indexOf(ArrayMultiTreeNode.this) + 1;
+				return rightSiblingNodeIndex <= mParent.subtreesSize ?
+						(TreeNode<T>) mParent.subtrees[rightSiblingNodeIndex] : null;
+			}
+		};
+	}
+
+	/**
+	 * Checks whether the current tree node is a leaf, e.g. does not have any
+	 * subtrees
+	 * <p>
+	 * Overridden to have a faster array implementation
+	 *
+	 * @return {@code true} if the current tree node is a leaf, e.g. does not
+	 *         have any subtrees; {@code false} otherwise
+	 */
+	@Override
+	public boolean isLeaf() {
+		return subtreesSize == 0;
+	}
+
+	/**
+	 * Checks whether among the current tree node subtrees there is
+	 * a specified subtree
+	 * <p>
+	 * Overridden to have a faster array implementation
+	 *
+	 * @param subtree subtree whose presence within the current tree
+	 *                node children is to be checked
+	 * @return {@code true} if among the current tree node subtrees
+	 *         there is a specified subtree; {@code false} otherwise
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean hasSubtree(TreeNode<T> subtree) {
+		if (isNull(subtree)
+				|| isLeaf()
+				|| subtree.isRoot()) {
+			return false;
+		}
+		for (int i = 0; i < subtreesSize; i++) {
+			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
+			if (subtree.equals(mSubtree)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the current tree node with all of its descendants
+	 * (entire tree) contains the specified node
+	 * <p>
+	 * Overridden to have a faster array implementation
+	 *
+	 * @param node node whose presence within the current tree node with
+	 *             all of its descendants (entire tree) is to be checked
+	 * @return {@code true} if the current node with all of its descendants
+	 *         (entire tree) contains the specified node; {@code false}
+	 *         otherwise
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean contains(TreeNode<T> node) {
+		if (isNull(node)
+				|| isLeaf()
+				|| node.isRoot()) {
+			return false;
+		}
+		for (int i = 0; i < subtreesSize; i++) {
+			TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+			if (subtree.equals(node)) {
+				return true;
+			}
+			if (subtree.contains(node)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -347,8 +379,8 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean remove(TreeNode<T> node) {
-		if (isLeaf()
-				|| node == null
+		if (isNull(node)
+				|| isLeaf()
 				|| node.isRoot()) {
 			return false;
 		}
@@ -356,8 +388,8 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 			return true;
 		}
 		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			if (mSubtree.remove(node)) {
+			TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+			if (subtree.remove(node)) {
 				return true;
 			}
 		}
@@ -380,8 +412,8 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		action.perform(this);
 		if (!isLeaf()) {
 			for (int i = 0; i < subtreesSize; i++) {
-				ArrayMultiTreeNode<T> mSubtree = (ArrayMultiTreeNode<T>) subtrees[i];
-				mSubtree.traversePreOrder(action);
+				TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+				subtree.traversePreOrder(action);
 			}
 		}
 	}
@@ -401,8 +433,8 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	public void traversePostOrder(TraversalAction<TreeNode<T>> action) {
 		if (!isLeaf()) {
 			for (int i = 0; i < subtreesSize; i++) {
-				ArrayMultiTreeNode<T> mSubtree = (ArrayMultiTreeNode<T>) subtrees[i];
-				mSubtree.traversePostOrder(action);
+				TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+				subtree.traversePostOrder(action);
 			}
 		}
 		action.perform(this);
@@ -423,12 +455,39 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 		if (isLeaf()) {
 			return 0;
 		}
-		int mHeight = 0;
+		int height = 0;
 		for (int i = 0; i < subtreesSize; i++) {
-			TreeNode<T> mSubtree = (TreeNode<T>) subtrees[i];
-			mHeight = Math.max(mHeight, mSubtree.height());
+			TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+			height = Math.max(height, subtree.height());
 		}
-		return mHeight + 1;
+		return height + 1;
+	}
+
+	/**
+	 * Adds the collection of the subtrees with all of theirs descendants
+	 * to the current tree node
+	 * <p>
+	 * Checks whether this tree node was changed as a result of the call
+	 *
+	 * @param subtrees collection of the subtrees with all of their
+	 *                 descendants
+	 * @return {@code true} if this tree node was changed as a
+	 *         result of the call; {@code false} otherwise
+	 */
+	@Override
+	public boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
+		if (areAllNulls(subtrees)) {
+			return false;
+		}
+		for (MultiTreeNode<T> subtree : subtrees) {
+			assignParent(subtree, this);
+		}
+		Object[] subtreesArray = subtrees.toArray();
+		int subtreesArrayLength = subtreesArray.length;
+		ensureSubtreesCapacity(subtreesSize + subtreesArrayLength);
+		System.arraycopy(subtreesArray, 0, this.subtrees, subtreesSize, subtreesArrayLength);
+		subtreesSize += subtreesArrayLength;
+		return subtreesArrayLength != 0;
 	}
 
 	/**
@@ -447,50 +506,23 @@ public class ArrayMultiTreeNode<T> extends AbstractMultiTreeNode<T> {
 	@Override
 	public Collection<? extends MultiTreeNode<T>> siblings() {
 		if (isRoot()) {
-			String message = String.format("Unable to find the siblings. " + AbstractTreeNode.NODE_IS_ROOT_MESSAGE, root());
+			String message = String.format("Unable to find the siblings. The tree node %1$s is root", root());
 			throw new TreeNodeException(message);
 		}
 		ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) parent;
-		int mParentSubtreesSize = mParent.subtreesSize;
-		if (mParentSubtreesSize == 1) {
+		int parentSubtreesSize = mParent.subtreesSize;
+		if (parentSubtreesSize == 1) {
 			return Collections.<MultiTreeNode<T>>emptyList();
 		}
-		Object[] mParentSubtreeObjects = mParent.subtrees;
-		Collection<MultiTreeNode<T>> mSiblings = new ArrayList<>(mParentSubtreesSize - 1);
-		for (int i = 0; i < mParentSubtreesSize; i++) {
-			MultiTreeNode<T> mSubtree = (MultiTreeNode<T>) mParentSubtreeObjects[i];
-			if (!mSubtree.equals(this)) {
-				mSiblings.add(mSubtree);
+		Object[] parentSubtreeObjects = mParent.subtrees;
+		Collection<MultiTreeNode<T>> siblings = new ArrayList<>(parentSubtreesSize - 1);
+		for (int i = 0; i < parentSubtreesSize; i++) {
+			MultiTreeNode<T> parentSubtree = (MultiTreeNode<T>) parentSubtreeObjects[i];
+			if (!parentSubtree.equals(this)) {
+				siblings.add(parentSubtree);
 			}
 		}
-		return mSiblings;
-	}
-
-	/**
-	 * Adds the collection of the subtrees with all of theirs descendants
-	 * to the current tree node
-	 * <p>
-	 * Checks whether this tree node was changed as a result of the call
-	 *
-	 * @param subtrees collection of the subtrees with all of their
-	 *                 descendants
-	 * @return {@code true} if this tree node was changed as a
-	 *         result of the call; {@code false} otherwise
-	 */
-	@Override
-	public boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
-		if (!AbstractTreeNode.isEligible(subtrees)) {
-			return false;
-		}
-		for (MultiTreeNode<T> mSubtree : subtrees) {
-			AbstractTreeNode.assignParent(mSubtree, this);
-		}
-		Object[] subtreesArray = subtrees.toArray();
-		int subtreesArrayLength = subtreesArray.length;
-		ensureSubtreesCapacity(subtreesSize + subtreesArrayLength);
-		System.arraycopy(subtreesArray, 0, this.subtrees, subtreesSize, subtreesArrayLength);
-		subtreesSize += subtreesArrayLength;
-		return subtreesArrayLength != 0;
+		return siblings;
 	}
 
 }

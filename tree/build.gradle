@@ -18,16 +18,15 @@
 
 apply plugin: 'java'
 
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
-
-tasks.withType(JavaCompile) {
-	options.warnings = false
-}
-
 // Publishing
 if (hasProperty('JAR_PUBLISHING_SCRIPT')) {
 	apply from: properties['JAR_PUBLISHING_SCRIPT']
+}
+
+compileJava {
+	sourceCompatibility = JavaVersion.VERSION_1_7
+	targetCompatibility = JavaVersion.VERSION_1_7
+	options.warnings = false
 }
 
 dependencies {
