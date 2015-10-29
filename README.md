@@ -204,7 +204,7 @@ that represent expressions
 
 ## Usage
 
-[**TreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TreeNode.java) - 
+[**TreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/TreeNode.java) - 
 is the top interface, which represents the basic tree data structures. It describes the basic methods, which are 
 implemented by all the trees
 
@@ -327,7 +327,7 @@ node.clear();
 
 ### Traversal
 
-[TraversalAction](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/TraversalAction.java)
+[TraversalAction](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/TraversalAction.java)
 allows to define an action, which has a single method **perform(TreeNode<T>)**. This method is called during traversal
 on each node visited
 
@@ -416,7 +416,7 @@ int height = node.height();
 
 ### K-ary (multinode) Trees
 
-[**MultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/MultiTreeNode.java) - 
+[**MultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/MultiTreeNode.java) - 
 interface, which adds additional methods for multi tree node (K-ary) tree data structures:
 
 ```java
@@ -441,7 +441,7 @@ boolean resultRemoveSubtrees = node.removeSubtrees(collectionToRemove);
 
 K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 2 implementations:
 
-* [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/util/tree/multinode/ArrayMultiTreeNode.java) - 
+* [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/ArrayMultiTreeNode.java) - 
 implementation based on the array-of-pointers
 * LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling representation
 
