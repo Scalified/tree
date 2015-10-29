@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.software.shell.tree.util.Validator.*;
-
 /**
  * This class represents the K-ary (multiple node) tree data
  * structure

@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.software.shell.tree.util.Validator.*;
-
 /**
  * This interface represents the basic tree data structure
  * <h1>Definition</h1>
@@ -243,7 +241,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         there is a specified subtree; {@code false} otherwise
 	 */
 	public boolean hasSubtree(TreeNode<T> subtree) {
-		if (isNull(subtree)
+		if (subtree == null
 				|| isLeaf()
 				|| subtree.isRoot()) {
 			return false;
@@ -267,7 +265,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         otherwise
 	 */
 	public boolean contains(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| isLeaf()
 				|| node.isRoot()) {
 			return false;
@@ -317,7 +315,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         the call; {@code false} otherwise
 	 */
 	public boolean remove(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| isLeaf()
 				|| node.isRoot()) {
 			return false;
@@ -437,7 +435,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *                           specified tree node is root
 	 */
 	public Collection<? extends TreeNode<T>> path(TreeNode<T> descendant) {
-		if (isNull(descendant)
+		if (descendant == null
 				|| isLeaf()
 				|| this.equals(descendant)) {
 			return Collections.singletonList(this);
@@ -475,7 +473,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 */
 	public TreeNode<T> commonAncestor(TreeNode<T> node) {
 		String errorMessage = "Unable to find the common ancestor between tree nodes. ";
-		if (isNull(node)) {
+		if (node == null) {
 			String message = errorMessage + "The specified tree node is null";
 			throw new TreeNodeException(message);
 		}
@@ -509,7 +507,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         have the same parent; {@code false} otherwise
 	 */
 	public boolean isSiblingOf(TreeNode<T> node) {
-		return isNotNull(node)
+		return node != null
 				&& !isRoot()
 				&& !node.isRoot()
 				&& this.parent().equals(node.parent());
@@ -524,7 +522,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         specified; {@code false} otherwise
 	 */
 	public boolean isAncestorOf(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| isLeaf()
 				|| node.isRoot()
 				|| this.equals(node)) {
@@ -549,7 +547,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *         specified; {@code false} otherwise
 	 */
 	public boolean isDescendantOf(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| this.isRoot()
 				|| node.isLeaf()
 				|| this.equals(node)) {
@@ -653,7 +651,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 		if (this == obj) {
 			return true;
 		}
-		if (isNull(obj)
+		if (obj == null
 				|| getClass() != obj.getClass()) {
 			return false;
 		}
@@ -723,7 +721,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 * @param <T> type of the data stored in the tree nodes
 	 */
 	protected static <T> void assignParent(TreeNode<T> node, TreeNode<T> parent) {
-		if (isNotNull(node)) {
+		if (node != null) {
 			node.parent = parent;
 		}
 	}
@@ -736,6 +734,52 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 */
 	protected static <T> void removeParentAssignment(TreeNode<T> node) {
 		node.parent = null;
+	}
+
+	/**
+	 * Checks whether there is at least one not {@code null} element within
+	 * the input collection
+	 * <pre>
+	 *     Validator.isAnyNotNull(Arrays.asList("foo", null))   = true
+	 *     Validator.isAnyNotNull(null)                         = false
+	 *     Validator.isAnyNotNull(Collections.emptyList())      = false
+	 *     Validator.isAnyNotNull(Arrays.asList(null, null))    = false
+	 * </pre>
+	 *
+	 * @param collection input collection to check
+	 * @param <T> type of the data, which parametrises collection
+	 * @return {@code true} if there is at least one not {@code null} element within
+	 *         the input collection; {@code false} otherwise
+	 */
+	protected static <T> boolean isAnyNotNull(Collection<T> collection) {
+		if (collection == null || collection.isEmpty()) {
+			return false;
+		}
+		for (T item : collection) {
+			if (item != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the specified collection is @{code null}, empty or if
+	 * all of its elements are {@code null}
+	 * <pre>
+	 *     Validator.areAllNulls(null)                          = true
+	 *     Validator.areAllNulls(Collections.emptyList())       = true
+	 *     Validator.areAllNulls(Arrays.asList(null, null))     = true
+	 *     Validator.areAllNulls(Arrays.asList("foo", null))    = false
+	 * </pre>
+	 *
+	 * @param collection input collection to check
+	 * @param <T> type of the data, which parametrises collection
+	 * @return {@code true} if the specified collection is {@code null}, empty
+	 *         or if all of its elements are {@code null}; {@code false} otherwise
+	 */
+	public static <T> boolean areAllNulls(Collection<T> collection) {
+		return !isAnyNotNull(collection);
 	}
 
 	/**
@@ -920,7 +964,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 					break;
 				}
 				TreeNode<T> rightSiblingNode = currentNode.iterator().checkAndGetRightSiblingNode();
-				if (isNotNull(rightSiblingNode)) {
+				if (rightSiblingNode != null) {
 					nextNode = rightSiblingNode;
 					break;
 				}
@@ -938,7 +982,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 		 * @return {@code true} if iteration has been started; {@code false} otherwise
 		 */
 		private boolean isIterationStarted() {
-			return isNotNull(currentNode);
+			return currentNode != null;
 		}
 
 	}

@@ -24,8 +24,6 @@ import com.software.shell.tree.TreeNodeException;
 
 import java.util.*;
 
-import static com.software.shell.tree.util.Validator.*;
-
 /**
  * Implementation of the K-ary (multi node) tree data structure,
  * based on the resizable array
@@ -136,7 +134,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	 */
 	@Override
 	public boolean add(TreeNode<T> subtree) {
-		if (isNull(subtree)) {
+		if (subtree == null) {
 			return false;
 		}
 		assignParent(subtree, this);
@@ -193,7 +191,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	 */
 	@Override
 	public boolean dropSubtree(TreeNode<T> subtree) {
-		if (isNull(subtree)
+		if (subtree == null
 				|| isLeaf()
 				|| subtree.isRoot()) {
 			return false;
@@ -318,7 +316,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean hasSubtree(TreeNode<T> subtree) {
-		if (isNull(subtree)
+		if (subtree == null
 				|| isLeaf()
 				|| subtree.isRoot()) {
 			return false;
@@ -347,7 +345,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean contains(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| isLeaf()
 				|| node.isRoot()) {
 			return false;
@@ -379,7 +377,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean remove(TreeNode<T> node) {
-		if (isNull(node)
+		if (node == null
 				|| isLeaf()
 				|| node.isRoot()) {
 			return false;
