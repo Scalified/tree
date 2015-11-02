@@ -58,7 +58,18 @@ public abstract class MultiTreeNode<T> extends TreeNode<T> {
 	 * @return {@code true} if this tree node was changed as a
 	 *         result of the call; {@code false} otherwise
 	 */
-	public abstract boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees);
+	public boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
+		if (areAllNulls(subtrees)) {
+			return false;
+		}
+		for (MultiTreeNode<T> subtree : subtrees) {
+			assignParent(subtree, this);
+			if (!add(subtree)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Returns the collection of nodes, which have the same parent

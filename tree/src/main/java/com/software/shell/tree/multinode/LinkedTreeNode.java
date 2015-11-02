@@ -41,7 +41,7 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 
 	private LinkedTreeNode<T> leftMostNode;
 
-	private LinkedTreeNode<T> rightSibling;
+	private LinkedTreeNode<T> rightSiblingNode;
 
 	/**
 	 * Creates an instance of this class
@@ -55,14 +55,14 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	@Override
 	public Collection<? extends TreeNode<T>> subtrees() {
 		if (isLeaf()) {
-			return Collections.singletonList(this);
+			return Collections.emptyList();
 		}
 		Collection<TreeNode<T>> subtrees = new LinkedList<>();
 		subtrees.add(leftMostNode);
-		LinkedTreeNode<T> nextRightSiblingNode = leftMostNode.rightSibling;
-		while (nextRightSiblingNode != null) {
-			subtrees.add(nextRightSiblingNode);
-			nextRightSiblingNode = nextRightSiblingNode.rightSibling;
+		LinkedTreeNode<T> nextSubtree = leftMostNode.rightSiblingNode;
+		while (nextSubtree != null) {
+			subtrees.add(nextSubtree);
+			nextSubtree = nextSubtree.rightSiblingNode;
 		}
 		return subtrees;
 	}
@@ -73,28 +73,14 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 			return false;
 		}
 		assignParent(subtree, this);
-		if (leftMostNode == null) {
+		if (isLeaf()) {
 			leftMostNode = (LinkedTreeNode<T>) subtree;
 		} else {
-			LinkedTreeNode<T> nextRightSiblingNode = leftMostNode;
-			while (nextRightSiblingNode.rightSibling != null) {
-				nextRightSiblingNode = nextRightSiblingNode.rightSibling;
+			LinkedTreeNode<T> nextSubtree = leftMostNode;
+			while (nextSubtree.rightSiblingNode != null) {
+				nextSubtree = nextSubtree.rightSiblingNode;
 			}
-			nextRightSiblingNode.rightSibling = (LinkedTreeNode<T>) subtree;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean addSubtrees(Collection<? extends MultiTreeNode<T>> subtrees) {
-		if (areAllNulls(subtrees)) {
-			return false;
-		}
-		for (MultiTreeNode<T> subtree : subtrees) {
-			assignParent(subtree, this);
-			if (!add(subtree)) {
-				return false;
-			}
+			nextSubtree.rightSiblingNode = (LinkedTreeNode<T>) subtree;
 		}
 		return true;
 	}
@@ -108,23 +94,29 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 		}
 		if (leftMostNode.equals(subtree)) {
 			removeParentAssignment(subtree);
-			leftMostNode = null;
+			leftMostNode = leftMostNode.rightSiblingNode;
+			return true;
 		} else {
-			LinkedTreeNode<T> nextRightSiblingNode = leftMostNode;
-			while (nextRightSiblingNode.rightSibling != null) {
-				nextRightSiblingNode = nextRightSiblingNode.rightSibling;
-				if (nextRightSiblingNode.equals(subtree)) {
+			LinkedTreeNode<T> nextSubtree = leftMostNode;
+			while (nextSubtree.rightSiblingNode != null) {
+				if (nextSubtree.rightSiblingNode.equals(subtree)) {
 					removeParentAssignment(subtree);
+					nextSubtree.rightSiblingNode = nextSubtree.rightSiblingNode.rightSiblingNode;
+					return true;
+				} else {
+					nextSubtree = nextSubtree.rightSiblingNode;
 				}
 			}
-
 		}
 		return false;
 	}
 
 	@Override
 	public void clear() {
-
+		if (!isLeaf()) {
+			removeParentAssignment(leftMostNode);
+			leftMostNode = null;
+		}
 	}
 
 	@Override
@@ -138,10 +130,15 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 
 			@Override
 			protected TreeNode<T> rightSiblingNode() {
-				return rightSibling;
+				return rightSiblingNode;
 			}
 
 		};
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return leftMostNode == null;
 	}
 
 }

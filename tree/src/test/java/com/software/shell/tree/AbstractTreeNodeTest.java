@@ -180,6 +180,8 @@ public abstract class AbstractTreeNodeTest {
 
 		Collection<TreeNode<String>> mSubtreesLevel3 = Collections.singletonList(node6);
 		assertEquals(message, mSubtreesLevel3, node5.subtrees());
+
+		assertEquals(message, Collections.emptyList(), node6.subtrees());
 	}
 
 	@Test

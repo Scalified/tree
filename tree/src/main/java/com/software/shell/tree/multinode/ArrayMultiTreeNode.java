@@ -110,7 +110,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@Override
 	public Collection<? extends TreeNode<T>> subtrees() {
 		if (isLeaf()) {
-			return Collections.<TreeNode<T>>singletonList(this);
+			return Collections.<TreeNode<T>>emptyList();
 		}
 		Collection<TreeNode<T>> subtrees = new ArrayList<>(subtreesSize);
 		for (int i = 0; i < subtreesSize; i++) {
