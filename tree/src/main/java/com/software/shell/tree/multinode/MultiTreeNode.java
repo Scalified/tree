@@ -63,7 +63,7 @@ public abstract class MultiTreeNode<T> extends TreeNode<T> {
 			return false;
 		}
 		for (MultiTreeNode<T> subtree : subtrees) {
-			assignParent(subtree, this);
+			linkParent(subtree, this);
 			if (!add(subtree)) {
 				return false;
 			}

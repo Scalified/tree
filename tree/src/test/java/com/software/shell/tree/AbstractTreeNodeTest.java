@@ -343,14 +343,22 @@ public abstract class AbstractTreeNodeTest {
 		assertFalse(node3.isLeaf());
 		node3.clear();
 		assertTrue(node3.isLeaf());
+		assertNull(node4.parent());
+		assertNull(node5.parent());
 
 		assertFalse(node2.isLeaf());
 		node2.clear();
 		assertTrue(node2.isLeaf());
+		assertNull(node3.parent());
+		assertNull(node7.parent());
+		assertNull(node8.parent());
 
 		assertFalse(root.isLeaf());
 		root.clear();
 		assertTrue(root.isLeaf());
+		assertNull(node1.parent());
+		assertNull(node2.parent());
+		assertNull(node9.parent());
 	}
 
 	@Test
@@ -435,7 +443,7 @@ public abstract class AbstractTreeNodeTest {
 	@Test
 	public void testTraversePreOrder() {
 		// Test tree pre order traversal is correct
-		String message = "Tree was incorrectly traversed in a preordered manner";
+		String message = "Tree was incorrectly traversed in a pre ordered manner";
 		final Collection<TreeNode<String>> mPreOrderedActual = new ArrayList<>(10);
 		TraversalAction<TreeNode<String>> action = populateCollectionAction(mPreOrderedActual);
 		root.traversePreOrder(action);
@@ -462,7 +470,7 @@ public abstract class AbstractTreeNodeTest {
 	@Test
 	public void testTraversePostOrder() {
 		// Test tree post order traversal is correct
-		String message = "Tree was incorrectly traversed in a postordered manner";
+		String message = "Tree was incorrectly traversed in a post ordered manner";
 		final Collection<TreeNode<String>> mPostOrderedActual = new ArrayList<>(10);
 		TraversalAction<TreeNode<String>> action = populateCollectionAction(mPostOrderedActual);
 		root.traversePostOrder(action);

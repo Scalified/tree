@@ -713,26 +713,26 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	}
 
 	/**
-	 * Assigns the specified parent tree node reference as the parent to the
+	 * Links the specified parent tree node reference as the parent to the
 	 * specified tree node
 	 *
 	 * @param node tree node to assign the parent tree node reference to
 	 * @param parent tree node to assign as a parent reference
 	 * @param <T> type of the data stored in the tree nodes
 	 */
-	protected static <T> void assignParent(TreeNode<T> node, TreeNode<T> parent) {
+	protected static <T> void linkParent(TreeNode<T> node, TreeNode<T> parent) {
 		if (node != null) {
 			node.parent = parent;
 		}
 	}
 
 	/**
-	 * Removes the parent tree node reference from the specified tree node
+	 * Removes the parent tree node reference link from the specified tree node
 	 *
 	 * @param node tree node to remove the parent tree node reference assignment from
 	 * @param <T> type of the data store in the tree node
 	 */
-	protected static <T> void removeParentAssignment(TreeNode<T> node) {
+	protected static <T> void unlinkParent(TreeNode<T> node) {
 		node.parent = null;
 	}
 

@@ -137,7 +137,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 		if (subtree == null) {
 			return false;
 		}
-		assignParent(subtree, this);
+		linkParent(subtree, this);
 		ensureSubtreesCapacity(subtreesSize + 1);
 		subtrees[subtreesSize++] = subtree;
 		return true;
@@ -205,7 +205,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 			System.arraycopy(subtrees, mSubtreeIndex + 1, subtrees, mSubtreeIndex, mNumShift);
 		}
 		subtrees[--subtreesSize] = null;
-		removeParentAssignment(subtree);
+		unlinkParent(subtree);
 		return true;
 	}
 
@@ -234,9 +234,14 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	 * Removes all the subtrees with all of its descendants from the current
 	 * tree node
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
 		if (!isLeaf()) {
+			for (int i = 0; i < subtreesSize; i++) {
+				TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+				unlinkParent(subtree);
+			}
 			subtrees = new Object[branchingFactor];
 			subtreesSize = 0;
 		}
@@ -478,7 +483,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 			return false;
 		}
 		for (MultiTreeNode<T> subtree : subtrees) {
-			assignParent(subtree, this);
+			linkParent(subtree, this);
 		}
 		Object[] subtreesArray = subtrees.toArray();
 		int subtreesArrayLength = subtreesArray.length;

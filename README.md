@@ -15,7 +15,7 @@ The Library requires [Oracle Java SE Development Kit 7u80](http://www.oracle.com
 
 ```java
 dependencies {
-	compile 'com.shell-software:tree:0.1.1'
+	compile 'com.shell-software:tree:0.2.0'
 }
 ```
 
@@ -23,21 +23,23 @@ dependencies {
 
 [**Full ChangeLog**](https://github.com/shell-software/tree/blob/master/CHANGELOG.md)
 
-### 0.1.0 - *previous*
-
-1. Initial release. There is only one implementation of the K-ary (multi node) tree data structure, 
-   based on the resizable array
-   
-### 0.1.1 - *current*
+### 0.1.1 - *previous*
 
 1. Changed java major version to 51 (Java 1.7)
 2. Removed unnecessary util package
+   
+### 0.2.0 - *current*
+
+1. Changed main interfaces to classes
+2. Added LinkedMultiTreeNode - MultiTreeNode implementation based on the leftmost-child-right-sibling representation
+3. Added subtrees clearing logic and tests
+3. Subtrees traversing code refactoring in MultiTreeNode implementations
         
 ### Features in the next versions:
 
-### 0.2.0:
+### 0.3.0:
 
-1. K-ary (multi node) tree data structure implementation, based on the leftmost-child right-sibling representation
+1. Binary trees
     
 ## Theory
 
@@ -442,8 +444,9 @@ boolean resultRemoveSubtrees = node.removeSubtrees(collectionToRemove);
 K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 2 implementations:
 
 * [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/ArrayMultiTreeNode.java) - 
-implementation based on the array-of-pointers
-* LinkedMultiTreeNode - implementation based on the leftmost-child-right-sibling representation
+implementation based on the array-of-pointers representation
+* [**LinkedMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/LinkedMultiTreeNode.java) -
+implementation based on the leftmost-child-right-sibling representation
 
 
 ## License
