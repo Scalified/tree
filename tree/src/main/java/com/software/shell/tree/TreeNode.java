@@ -19,6 +19,7 @@
 package com.software.shell.tree;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -111,11 +112,11 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 * Returns the collection of the child nodes of the current node
 	 * with all of its proper descendants, if any
 	 * <p>
-	 * Returns {@code null} if the current node is leaf
+	 * Returns {@link Collections#emptySet()} if the current node is leaf
 	 *
 	 * @return collection of the child nodes of the current node with
 	 *         all of its proper descendants, if any;
-	 *         {@code null} if the current node is leaf
+	 *         {@link Collections#emptySet()} if the current node is leaf
 	 */
 	public abstract Collection<? extends TreeNode<T>> subtrees();
 
@@ -229,6 +230,67 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 */
 	public boolean isLeaf() {
 		return subtrees().isEmpty();
+	}
+
+	/**
+	 * Searches the tree node within the tree, which has the specified data,
+	 * starting from the current tree node and returns the first occurrence of it
+	 *
+	 * @param data data to find the tree node with
+	 * @return first occurrence of the searched tree node with data specified
+	 */
+	@SuppressWarnings("unchecked")
+	public TreeNode<T> find(final T data) {
+		if (isLeaf()) {
+			return (data() == null ? data == null : data().equals(data)) ? this : null;
+		}
+		final TreeNode<T>[] searchedNode = (TreeNode<T>[]) Array.newInstance(getClass(), 1);
+		traversePreOrder(new TraversalAction<TreeNode<T>>() {
+			@Override
+			public void perform(TreeNode<T> node) {
+				if ((node.data() == null ?
+						data == null : node.data().equals(data))) {
+					searchedNode[0] = node;
+				}
+			}
+
+			@Override
+			public boolean isCompleted() {
+				return searchedNode[0] != null;
+			}
+		});
+		return searchedNode[0];
+	}
+
+	/**
+	 * Searches the tree nodes within the tree, which have the specified data,
+	 * starting from the current tree node and returns the collection of the found
+	 * tree nodes
+	 *
+	 * @param data data to find the tree nodes with
+	 * @return collection of the searched tree nodes with data specified
+	 */
+	public Collection<? extends TreeNode<T>> findAll(final T data) {
+		if (isLeaf()) {
+			return (data() == null ? data == null : data().equals(data)) ?
+					Collections.singleton(this) : Collections.<TreeNode<T>>emptySet();
+		}
+		final Collection<TreeNode<T>> searchedNodes = new HashSet<>();
+		traversePreOrder(new TraversalAction<TreeNode<T>>() {
+			@Override
+			public void perform(TreeNode<T> node) {
+				if ((node.data() == null ?
+						data == null : node.data().equals(data))) {
+					searchedNodes.add(node);
+				}
+			}
+
+			@Override
+			public boolean isCompleted() {
+				return false;
+			}
+		});
+		return searchedNodes;
 	}
 
 	/**
@@ -365,10 +427,12 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *               node, while traversing the tree
 	 */
 	public void traversePreOrder(TraversalAction<TreeNode<T>> action) {
-		action.perform(this);
-		if (!isLeaf()) {
-			for (TreeNode<T> subtree : subtrees()) {
-				subtree.traversePreOrder(action);
+		if (!action.isCompleted()) {
+			action.perform(this);
+			if (!isLeaf()) {
+				for (TreeNode<T> subtree : subtrees()) {
+					subtree.traversePreOrder(action);
+				}
 			}
 		}
 	}
@@ -382,12 +446,14 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *               node, while traversing the tree
 	 */
 	public void traversePostOrder(TraversalAction<TreeNode<T>> action) {
-		if (!isLeaf()) {
-			for (TreeNode<T> subtree : subtrees()) {
-				subtree.traversePostOrder(action);
+		if (!action.isCompleted()) {
+			if (!isLeaf()) {
+				for (TreeNode<T> subtree : subtrees()) {
+					subtree.traversePostOrder(action);
+				}
 			}
+			action.perform(this);
 		}
-		action.perform(this);
 	}
 
 	/**
@@ -399,7 +465,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 */
 	public Collection<TreeNode<T>> preOrdered() {
 		if (isLeaf()) {
-			return Collections.singletonList(this);
+			return Collections.singleton(this);
 		}
 		final Collection<TreeNode<T>> mPreOrdered = new ArrayList<>();
 		TraversalAction<TreeNode<T>> action = populateAction(mPreOrdered);
@@ -416,7 +482,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 */
 	public Collection<TreeNode<T>> postOrdered() {
 		if (isLeaf()) {
-			return Collections.singletonList(this);
+			return Collections.singleton(this);
 		}
 		final Collection<TreeNode<T>> mPostOrdered = new ArrayList<>();
 		TraversalAction<TreeNode<T>> action = populateAction(mPostOrdered);
@@ -578,6 +644,11 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 			public void perform(TreeNode<T> node) {
 				count[0]++;
 			}
+
+			@Override
+			public boolean isCompleted() {
+				return false;
+			}
 		};
 		traversePreOrder(action);
 		return count[0];
@@ -691,6 +762,11 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 						.append(node.data())
 						.append("\n");
 			}
+
+			@Override
+			public boolean isCompleted() {
+				return false;
+			}
 		};
 		traversePreOrder(action);
 		return builder.toString();
@@ -708,6 +784,11 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 			@Override
 			public void perform(TreeNode<T> node) {
 				collection.add(node);
+			}
+
+			@Override
+			public boolean isCompleted() {
+				return false;
 			}
 		};
 	}
@@ -767,10 +848,10 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 * Checks whether the specified collection is @{code null}, empty or if
 	 * all of its elements are {@code null}
 	 * <pre>
-	 *     Validator.areAllNulls(null)                          = true
-	 *     Validator.areAllNulls(Collections.emptyList())       = true
-	 *     Validator.areAllNulls(Arrays.asList(null, null))     = true
-	 *     Validator.areAllNulls(Arrays.asList("foo", null))    = false
+	 *     areAllNulls(null)                          = true
+	 *     areAllNulls(Collections.emptyList())       = true
+	 *     areAllNulls(Arrays.asList(null, null))     = true
+	 *     areAllNulls(Arrays.asList("foo", null))    = false
 	 * </pre>
 	 *
 	 * @param collection input collection to check
@@ -778,7 +859,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 * @return {@code true} if the specified collection is {@code null}, empty
 	 *         or if all of its elements are {@code null}; {@code false} otherwise
 	 */
-	public static <T> boolean areAllNulls(Collection<T> collection) {
+	protected static <T> boolean areAllNulls(Collection<T> collection) {
 		return !isAnyNotNull(collection);
 	}
 

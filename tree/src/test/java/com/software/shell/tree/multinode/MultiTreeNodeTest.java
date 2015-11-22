@@ -18,15 +18,12 @@
 
 package com.software.shell.tree.multinode;
 
-import com.software.shell.tree.AbstractTreeNodeTest;
+import com.software.shell.tree.TreeNodeTest;
 import com.software.shell.tree.TreeNode;
 import com.software.shell.tree.TreeNodeException;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -35,7 +32,7 @@ import static org.junit.Assert.*;
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class AbstractMultiTreeNodeTest extends AbstractTreeNodeTest {
+public abstract class MultiTreeNodeTest extends TreeNodeTest {
 
 	/*
 	 * Test tree structure
@@ -59,19 +56,18 @@ public abstract class AbstractMultiTreeNodeTest extends AbstractTreeNodeTest {
 		// Test the specified tree nodes are the siblings of the current node
 		String message = "Tree node siblings were incorrectly determined";
 
-		Collection<TreeNode<String>> mSiblingsLevel1 = new ArrayList<>(2);
+		Collection<TreeNode<String>> mSiblingsLevel1 = new HashSet<>(2);
 		mSiblingsLevel1.add(node2);
 		mSiblingsLevel1.add(node9);
 
-		Collection<TreeNode<String>> mSiblingsLevel2 = new ArrayList<>(2);
+		Collection<TreeNode<String>> mSiblingsLevel2 = new HashSet<>(2);
 		mSiblingsLevel2.add(node3);
 		mSiblingsLevel2.add(node7);
 
 		assertEquals(message, mSiblingsLevel1, ((MultiTreeNode<String>) node1).siblings());
 		assertEquals(message, mSiblingsLevel2, ((MultiTreeNode<String>) node8).siblings());
 
-		assertEquals(message, Collections.<MultiTreeNode<String>>emptyList(),
-				((MultiTreeNode<String>) node6).siblings());
+		assertEquals(message, Collections.emptySet(), ((MultiTreeNode<String>) node6).siblings());
 	}
 
 	@Test(expected = TreeNodeException.class)

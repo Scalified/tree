@@ -33,7 +33,7 @@ dependencies {
 1. Changed main interfaces to classes
 2. Added LinkedMultiTreeNode - MultiTreeNode implementation based on the leftmost-child-right-sibling representation
 3. Added subtrees clearing logic and tests
-3. Subtrees traversing code refactoring in MultiTreeNode implementations
+4. New find and findAll methods - allows to find nodes within the tree with the specified data
         
 ### Features in the next versions:
 
@@ -129,13 +129,13 @@ The downward arrows are the leftmost-child links; the sideways arrows are the ri
 
 **Traversal** is a process of visiting each node in a tree data structure, exactly once, in a systematic way
 
-**Preorder** is a form of tree traversal, where the action is called firstly on the current node, and then the 
-preorder function is called again recursively on each subtree from left to right
-<br>Preorder listing on the figure is: **+ a − b c d**
+**Pre order** is a form of tree traversal, where the action is called firstly on the current node, and then the 
+pre order function is called again recursively on each subtree from left to right
+<br>Pre order listing on the figure is: **+ a − b c d**
 
-**Postorder** is a form of tree traversal, where the postorder function is called recursively on each subtree 
+**Post order** is a form of tree traversal, where the post order function is called recursively on each subtree 
 from left to right and then the action is called
-<br>Postorder listing on the figure is: **a b c − d * +**
+<br>Post order listing on the figure is: **a b c − d * +**
 
 #### Evaluating Expression Tree
 
@@ -307,6 +307,16 @@ Collection<TreeNode<String>> collectionToCheck;
 boolean resultContainsAll = node.containsAll(collectionToCheck);
 ```
 
+### Finding nodes
+
+```java
+// Finding the first occurence of the tree node within the tree with the specified data
+TreeNode<String> nodeToFind = node.find("dataToFind");
+
+// Finding the collection of all tree nodes within the tree with the specified data
+Collection<TreeNode<String>> nodesToFind = node.findAll("dataToFind");
+```
+
 ### Modification
 
 ```java
@@ -339,6 +349,11 @@ TraversalAction<TreeNode<String>> action = new TraversalAction<TreeNode<String>>
 	@Override
 	public void perform(TreeNode<String> node) {
 		System.out.println(node.data()); // any other action goes here
+	}
+	
+	@Override
+	public boolean isCompleted() {
+	    return false; // return true in order to stop traversing
 	}
 };
 
@@ -441,13 +456,14 @@ Collection<? extends MultiTreeNode<String>> collectionToRemove;
 boolean resultRemoveSubtrees = node.removeSubtrees(collectionToRemove);
 ```
 
-K-ary (multinode) trees are represented by **MultiTreeNode** interface and have 2 implementations:
+K-ary (multi node) trees are represented by **MultiTreeNode** interface and have 2 implementations:
 
 * [**ArrayMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/ArrayMultiTreeNode.java) - 
 implementation based on the array-of-pointers representation
 * [**LinkedMultiTreeNode**](https://github.com/shell-software/tree/blob/master/tree/src/main/java/com/software/shell/tree/multinode/LinkedMultiTreeNode.java) -
 implementation based on the leftmost-child-right-sibling representation
 
+**LinkedMultiTreeNode** is better optimized for trees with many nodes, whereas **ArrayMultiTreeNode** is better for large node trees
 
 ## License
 

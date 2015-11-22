@@ -24,6 +24,7 @@ import com.software.shell.tree.TreeNodeException;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -34,7 +35,7 @@ import java.util.LinkedList;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class LinkedTreeNode<T> extends MultiTreeNode<T> {
+public class LinkedMultiTreeNode<T> extends MultiTreeNode<T> {
 
 	/**
 	 * Current UID of this object used for serialization
@@ -44,27 +45,27 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	/**
 	 * A reference to the first subtree tree node of the current tree node
 	 */
-	private LinkedTreeNode<T> leftMostNode;
+	private LinkedMultiTreeNode<T> leftMostNode;
 
 	/**
 	 * A reference to the right sibling tree node of the current tree node
 	 */
-	private LinkedTreeNode<T> rightSiblingNode;
+	private LinkedMultiTreeNode<T> rightSiblingNode;
 
 	/**
 	 * A reference to the last subtree node of the current tree node
 	 * <p>
-	 * Used to optimize the addition of the new tree nodes to the current
-	 * tree node
+	 * Used to avoid the discovery of the last subtree node. As a result
+	 * significantly optimized such operations like addition etc.
 	 */
-	private LinkedTreeNode<T> lastSubtreeNode;
+	private LinkedMultiTreeNode<T> lastSubtreeNode;
 
 	/**
 	 * Creates an instance of this class
 	 *
 	 * @param data data to store in the current tree node
 	 */
-	public LinkedTreeNode(T data) {
+	public LinkedMultiTreeNode(T data) {
 		super(data);
 	}
 
@@ -72,20 +73,20 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	 * Returns the collection of the child nodes of the current node
 	 * with all of its proper descendants, if any
 	 * <p>
-	 * Returns {@code null} if the current node is leaf
+	 * Returns {@link Collections#emptySet()} if the current node is leaf
 	 *
 	 * @return collection of the child nodes of the current node with
 	 *         all of its proper descendants, if any;
-	 *         {@code null} if the current node is leaf
+	 *         {@link Collections#emptySet()} if the current node is leaf
 	 */
 	@Override
 	public Collection<? extends TreeNode<T>> subtrees() {
 		if (isLeaf()) {
-			return Collections.emptyList();
+			return Collections.emptySet();
 		}
-		Collection<TreeNode<T>> subtrees = new LinkedList<>();
+		Collection<TreeNode<T>> subtrees = new HashSet<>();
 		subtrees.add(leftMostNode);
-		LinkedTreeNode<T> nextSubtree = leftMostNode.rightSiblingNode;
+		LinkedMultiTreeNode<T> nextSubtree = leftMostNode.rightSiblingNode;
 		while (nextSubtree != null) {
 			subtrees.add(nextSubtree);
 			nextSubtree = nextSubtree.rightSiblingNode;
@@ -112,10 +113,10 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 		}
 		linkParent(subtree, this);
 		if (isLeaf()) {
-			leftMostNode = (LinkedTreeNode<T>) subtree;
+			leftMostNode = (LinkedMultiTreeNode<T>) subtree;
 			lastSubtreeNode = leftMostNode;
 		} else {
-			lastSubtreeNode.rightSiblingNode = (LinkedTreeNode<T>) subtree;
+			lastSubtreeNode.rightSiblingNode = (LinkedMultiTreeNode<T>) subtree;
 			lastSubtreeNode = lastSubtreeNode.rightSiblingNode;
 		}
 		return true;
@@ -142,15 +143,15 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 		if (leftMostNode.equals(subtree)) {
 			leftMostNode = leftMostNode.rightSiblingNode;
 			unlinkParent(subtree);
-			((LinkedTreeNode<T>) subtree).rightSiblingNode = null;
+			((LinkedMultiTreeNode<T>) subtree).rightSiblingNode = null;
 			return true;
 		} else {
-			LinkedTreeNode<T> nextSubtree = leftMostNode;
+			LinkedMultiTreeNode<T> nextSubtree = leftMostNode;
 			while (nextSubtree.rightSiblingNode != null) {
 				if (nextSubtree.rightSiblingNode.equals(subtree)) {
 					unlinkParent(subtree);
 					nextSubtree.rightSiblingNode = nextSubtree.rightSiblingNode.rightSiblingNode;
-					((LinkedTreeNode<T>) subtree).rightSiblingNode = null;
+					((LinkedMultiTreeNode<T>) subtree).rightSiblingNode = null;
 					return true;
 				} else {
 					nextSubtree = nextSubtree.rightSiblingNode;
@@ -167,10 +168,10 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	@Override
 	public void clear() {
 		if (!isLeaf()) {
-			LinkedTreeNode<T> nextNode = leftMostNode;
+			LinkedMultiTreeNode<T> nextNode = leftMostNode;
 			while (nextNode != null) {
 				unlinkParent(nextNode);
-				LinkedTreeNode<T> nextNodeRightSiblingNode = nextNode.rightSiblingNode;
+				LinkedMultiTreeNode<T> nextNodeRightSiblingNode = nextNode.rightSiblingNode;
 				nextNode.rightSiblingNode = null;
 				nextNode.lastSubtreeNode = null;
 				nextNode = nextNodeRightSiblingNode;
@@ -190,11 +191,29 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	public TreeNodeIterator iterator() {
 		return new TreeNodeIterator() {
 
+			/**
+			 * Returns the leftmost node of the current tree node if the
+			 * current tree node is not a leaf
+			 *
+			 * @return leftmost node of the current tree node if the current
+			 *         tree node is not a leaf
+			 * @throws TreeNodeException an exception that is thrown in case
+			 *                           if the current tree node is a leaf
+			 */
 			@Override
 			protected TreeNode<T> leftMostNode() {
 				return leftMostNode;
 			}
 
+			/**
+			 * Returns the right sibling node of the current tree node if the
+			 * current tree node is not root
+			 *
+			 * @return right sibling node of the current tree node if the current
+			 *         tree node is not root
+			 * @throws TreeNodeException an exception that may be thrown in case if
+			 *                           the current tree node is root
+			 */
 			@Override
 			protected TreeNode<T> rightSiblingNode() {
 				return rightSiblingNode;
@@ -233,7 +252,7 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 				|| subtree.isRoot()) {
 			return false;
 		}
-		LinkedTreeNode<T> nextSubtree = leftMostNode;
+		LinkedMultiTreeNode<T> nextSubtree = leftMostNode;
 		while (nextSubtree != null) {
 			if (nextSubtree.equals(subtree)) {
 				return true;
@@ -263,7 +282,7 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 				|| node.isRoot()) {
 			return false;
 		}
-		LinkedTreeNode<T> nextSubtree = leftMostNode;
+		LinkedMultiTreeNode<T> nextSubtree = leftMostNode;
 		while (nextSubtree != null) {
 			if (nextSubtree.equals(node)) {
 				return true;
@@ -298,7 +317,7 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 		if (dropSubtree(node)) {
 			return true;
 		}
-		LinkedTreeNode<T> nextSubtree = leftMostNode;
+		LinkedMultiTreeNode<T> nextSubtree = leftMostNode;
 		while (nextSubtree != null) {
 			if (nextSubtree.remove(node)) {
 				return true;
@@ -320,12 +339,14 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	 */
 	@Override
 	public void traversePreOrder(TraversalAction<TreeNode<T>> action) {
-		action.perform(this);
-		if (!isLeaf()) {
-			LinkedTreeNode<T> nextNode = leftMostNode;
-			while (nextNode != null) {
-				nextNode.traversePreOrder(action);
-				nextNode = nextNode.rightSiblingNode;
+		if (!action.isCompleted()) {
+			action.perform(this);
+			if (!isLeaf()) {
+				LinkedMultiTreeNode<T> nextNode = leftMostNode;
+				while (nextNode != null) {
+					nextNode.traversePreOrder(action);
+					nextNode = nextNode.rightSiblingNode;
+				}
 			}
 		}
 	}
@@ -342,14 +363,16 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 	 */
 	@Override
 	public void traversePostOrder(TraversalAction<TreeNode<T>> action) {
-		if (!isLeaf()) {
-			LinkedTreeNode<T> nextNode = leftMostNode;
-			while (nextNode != null) {
-				nextNode.traversePostOrder(action);
-				nextNode = nextNode.rightSiblingNode;
+		if (!action.isCompleted()) {
+			if (!isLeaf()) {
+				LinkedMultiTreeNode<T> nextNode = leftMostNode;
+				while (nextNode != null) {
+					nextNode.traversePostOrder(action);
+					nextNode = nextNode.rightSiblingNode;
+				}
 			}
+			action.perform(this);
 		}
-		action.perform(this);
 	}
 
 	/**
@@ -367,7 +390,7 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 			return 0;
 		}
 		int height = 0;
-		LinkedTreeNode<T> nextNode = leftMostNode;
+		LinkedMultiTreeNode<T> nextNode = leftMostNode;
 		while (nextNode != null) {
 			height = Math.max(height, nextNode.height());
 			nextNode = nextNode.rightSiblingNode;
@@ -393,12 +416,12 @@ public class LinkedTreeNode<T> extends MultiTreeNode<T> {
 			String message = String.format("Unable to find the siblings. The tree node %1$s is root", root());
 			throw new TreeNodeException(message);
 		}
-		LinkedTreeNode<T> firstNode = ((LinkedTreeNode<T>) parent()).leftMostNode;
+		LinkedMultiTreeNode<T> firstNode = ((LinkedMultiTreeNode<T>) parent()).leftMostNode;
 		if (firstNode.rightSiblingNode == null) {
-			return Collections.<MultiTreeNode<T>>emptyList();
+			return Collections.emptySet();
 		}
-		Collection<MultiTreeNode<T>> siblings = new LinkedList<>();
-		LinkedTreeNode<T> nextNode = firstNode;
+		Collection<MultiTreeNode<T>> siblings = new HashSet<>();
+		LinkedMultiTreeNode<T> nextNode = firstNode;
 		while (nextNode != null) {
 			if (!nextNode.equals(this)) {
 				siblings.add(nextNode);

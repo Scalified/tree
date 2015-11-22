@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class AbstractTreeNodeTest {
+public abstract class TreeNodeTest {
 	
 	/*
 	 * Test tree structure
@@ -166,22 +166,22 @@ public abstract class AbstractTreeNodeTest {
 		// Test if subtrees are correctly determined
 		String message = "Subtrees collection was incorrectly determined";
 
-		Collection<TreeNode<String>> mSubtreesLevel1 = new ArrayList<>(3);
+		Collection<TreeNode<String>> mSubtreesLevel1 = new HashSet<>(3);
 		mSubtreesLevel1.add(node1);
 		mSubtreesLevel1.add(node2);
 		mSubtreesLevel1.add(node9);
 		assertEquals(message, mSubtreesLevel1, root.subtrees());
 
-		Collection<TreeNode<String>> mSubtreesLevel2 = new ArrayList<>(3);
+		Collection<TreeNode<String>> mSubtreesLevel2 = new HashSet<>(3);
 		mSubtreesLevel2.add(node3);
 		mSubtreesLevel2.add(node7);
 		mSubtreesLevel2.add(node8);
 		assertEquals(message, mSubtreesLevel2, node2.subtrees());
 
-		Collection<TreeNode<String>> mSubtreesLevel3 = Collections.singletonList(node6);
+		Collection<TreeNode<String>> mSubtreesLevel3 = Collections.singleton(node6);
 		assertEquals(message, mSubtreesLevel3, node5.subtrees());
 
-		assertEquals(message, Collections.emptyList(), node6.subtrees());
+		assertEquals(message, Collections.emptySet(), node6.subtrees());
 	}
 
 	@Test
@@ -193,6 +193,48 @@ public abstract class AbstractTreeNodeTest {
 		// Test if tree node with subtrees is not a leaf
 		String messageNotLeafExpected = "The tree node was not expected to be a leaf, but actually was";
 		assertFalse(messageNotLeafExpected, root.isLeaf());
+	}
+
+	@Test
+	public void testFind() {
+		// Test if the tree node has the searched data
+		String messageTreeNodeFoundExpected = "The tree expected to have the searched data, but actually was not";
+		assertEquals(messageTreeNodeFoundExpected, node6, node6.find(NODE_DATA_4));
+		assertEquals(messageTreeNodeFoundExpected, node7, node2.find(null));
+		assertEquals(messageTreeNodeFoundExpected, node7, node7.find(null));
+		assertEquals(messageTreeNodeFoundExpected, node5, node3.find(NODE_DATA_1));
+		assertEquals(messageTreeNodeFoundExpected, node4, root.find(NODE_DATA_4));
+
+		// Test if the tree node does not have the searched data
+		String messageTreeNodeNotFoundExpected =
+				"The tree with the searched data was not expected to be found, but actually was";
+		assertNull(messageTreeNodeNotFoundExpected, node6.find("data"));
+		assertNull(messageTreeNodeNotFoundExpected, root.find("data"));
+	}
+
+	@Test
+	public void testFindAll() {
+		// Test if the tree has a single tree node with the searched data
+		String messageSingletonCollectionFoundExpected =
+				"The single tree node was expected to have the searched data, but actually was not";
+		assertEquals(messageSingletonCollectionFoundExpected, Collections.singleton(node6), node6.findAll(NODE_DATA_4));
+		assertEquals(messageSingletonCollectionFoundExpected, Collections.singleton(node7), node7.findAll(null));
+		assertEquals(messageSingletonCollectionFoundExpected, Collections.singleton(node2), root.findAll(NODE_DATA_2));
+
+		// Test if the tree has more than one node with the searched data
+		String messageCollectionFoundExpected =
+				"The tree nodes was expected to have the searched data, but actually was not";
+		Collection<TreeNode<String>> expectedMany = new HashSet<>();
+		expectedMany.add(node4);
+		expectedMany.add(node6);
+		expectedMany.add(node9);
+		assertEquals(messageCollectionFoundExpected, expectedMany, root.findAll(NODE_DATA_4));
+
+
+		// Test if the tree does not have any tree node with the searched data
+		String messageEmptyCollectionFoundExpected =
+				"Three tree nodes with the searched data was not expected to be found, but actually was";
+		assertEquals(messageEmptyCollectionFoundExpected, Collections.emptySet(), node10.findAll("data"));
 	}
 
 	@Test
@@ -501,6 +543,11 @@ public abstract class AbstractTreeNodeTest {
 			public void perform(TreeNode<String> node) {
 				collection.add(node);
 			}
+
+			@Override
+			public boolean isCompleted() {
+				return false;
+			}
 		};
 	}
 
@@ -509,7 +556,7 @@ public abstract class AbstractTreeNodeTest {
 		// Test tree pre ordered collection is correct
 		String message = "Tree was incorrectly pre ordered";
 		assertEquals(message, preOrderedExpected(), root.preOrdered());
-		assertEquals(message, Collections.singletonList(node10), node10.preOrdered());
+		assertEquals(message, Collections.singleton(node10), node10.preOrdered());
 	}
 
 	@Test
@@ -517,7 +564,7 @@ public abstract class AbstractTreeNodeTest {
 		// Test tree post ordered collection is correct
 		String message = "Tree was incorrectly post ordered";
 		assertEquals(message, postOrderedExpected(), root.postOrdered());
-		assertEquals(message, Collections.singletonList(node1), node1.postOrdered());
+		assertEquals(message, Collections.singleton(node1), node1.postOrdered());
 	}
 
 	@Test
@@ -525,7 +572,7 @@ public abstract class AbstractTreeNodeTest {
 		// Test path is correctly determined
 		String message = "The path between nodes was incorrectly determined";
 
-		Collection<TreeNode<String>> mPath1 = new ArrayList<>(5);
+		Collection<TreeNode<String>> mPath1 = new LinkedList<>();
 		mPath1.add(root);
 		mPath1.add(node2);
 		mPath1.add(node3);
@@ -533,7 +580,7 @@ public abstract class AbstractTreeNodeTest {
 		mPath1.add(node6);
 		assertEquals(message, mPath1, root.path(node6));
 
-		Collection<TreeNode<String>> mPath2 = new ArrayList<>(2);
+		Collection<TreeNode<String>> mPath2 = new LinkedList<>();
 		mPath2.add(node2);
 		mPath2.add(node8);
 		assertEquals(message, mPath2, node2.path(node8));

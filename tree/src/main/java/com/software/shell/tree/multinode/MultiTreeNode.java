@@ -24,6 +24,7 @@ import com.software.shell.tree.TreeNodeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * This class represents the K-ary (multiple node) tree data
@@ -89,9 +90,9 @@ public abstract class MultiTreeNode<T> extends TreeNode<T> {
 		Collection<? extends TreeNode<T>> parentSubtrees = parent.subtrees();
 		int parentSubtreesSize = parentSubtrees.size();
 		if (parentSubtreesSize == 1) {
-			return Collections.<MultiTreeNode<T>> emptyList();
+			return Collections.emptySet();
 		}
-		Collection<MultiTreeNode<T>> siblings = new ArrayList<>(parentSubtreesSize - 1);
+		Collection<MultiTreeNode<T>> siblings = new HashSet<>(parentSubtreesSize - 1);
 		for (TreeNode<T> parentSubtree : parentSubtrees) {
 			if (!parentSubtree.equals(this)) {
 				siblings.add((MultiTreeNode<T>) parentSubtree);

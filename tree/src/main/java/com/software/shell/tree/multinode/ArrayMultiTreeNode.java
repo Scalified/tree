@@ -26,7 +26,7 @@ import java.util.*;
 
 /**
  * Implementation of the K-ary (multi node) tree data structure,
- * based on the resizable array
+ * based on the resizable array representation
  *
  * @author shell
  * @version 1.0.0
@@ -100,19 +100,19 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	 * Returns the collection of the child nodes of the current node
 	 * with all of its proper descendants, if any
 	 * <p>
-	 * Returns {@code null} if the current node is leaf
+	 * Returns {@link Collections#emptySet()} if the current node is leaf
 	 *
 	 * @return collection of the child nodes of the current node with
 	 *         all of its proper descendants, if any;
-	 *         {@code null} if the current node is leaf
+	 *         {@link Collections#emptySet()} if the current node is leaf
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<? extends TreeNode<T>> subtrees() {
 		if (isLeaf()) {
-			return Collections.<TreeNode<T>>emptyList();
+			return Collections.<TreeNode<T>>emptySet();
 		}
-		Collection<TreeNode<T>> subtrees = new ArrayList<>(subtreesSize);
+		Collection<TreeNode<T>> subtrees = new HashSet<>(subtreesSize);
 		for (int i = 0; i < subtreesSize; i++) {
 			TreeNode<T> subtree = (TreeNode<T>) this.subtrees[i];
 			subtrees.add(subtree);
@@ -412,11 +412,13 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void traversePreOrder(TraversalAction<TreeNode<T>> action) {
-		action.perform(this);
-		if (!isLeaf()) {
-			for (int i = 0; i < subtreesSize; i++) {
-				TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
-				subtree.traversePreOrder(action);
+		if (!action.isCompleted()) {
+			action.perform(this);
+			if (!isLeaf()) {
+				for (int i = 0; i < subtreesSize; i++) {
+					TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+					subtree.traversePreOrder(action);
+				}
 			}
 		}
 	}
@@ -434,13 +436,15 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void traversePostOrder(TraversalAction<TreeNode<T>> action) {
-		if (!isLeaf()) {
-			for (int i = 0; i < subtreesSize; i++) {
-				TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
-				subtree.traversePostOrder(action);
+		if (!action.isCompleted()) {
+			if (!isLeaf()) {
+				for (int i = 0; i < subtreesSize; i++) {
+					TreeNode<T> subtree = (TreeNode<T>) subtrees[i];
+					subtree.traversePostOrder(action);
+				}
 			}
+			action.perform(this);
 		}
-		action.perform(this);
 	}
 
 	/**
@@ -515,10 +519,10 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 		ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) parent;
 		int parentSubtreesSize = mParent.subtreesSize;
 		if (parentSubtreesSize == 1) {
-			return Collections.<MultiTreeNode<T>>emptyList();
+			return Collections.emptySet();
 		}
 		Object[] parentSubtreeObjects = mParent.subtrees;
-		Collection<MultiTreeNode<T>> siblings = new ArrayList<>(parentSubtreesSize - 1);
+		Collection<MultiTreeNode<T>> siblings = new HashSet<>(parentSubtreesSize - 1);
 		for (int i = 0; i < parentSubtreesSize; i++) {
 			MultiTreeNode<T> parentSubtree = (MultiTreeNode<T>) parentSubtreeObjects[i];
 			if (!parentSubtree.equals(this)) {

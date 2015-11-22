@@ -13,4 +13,4 @@
 1. Changed main interfaces to classes
 2. Added LinkedMultiTreeNode - MultiTreeNode implementation based on the leftmost-child-right-sibling representation
 3. Added subtrees clearing logic and tests
-3. Subtrees traversing code refactoring in MultiTreeNode implementations
+4. New find and findAll methods - allows to find nodes within the tree with the specified data

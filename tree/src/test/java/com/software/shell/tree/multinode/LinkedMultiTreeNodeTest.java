@@ -25,7 +25,7 @@ import com.software.shell.tree.TreeNode;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class LinkedMultiTreeNodeTest extends AbstractMultiTreeNodeTest {
+public class LinkedMultiTreeNodeTest extends MultiTreeNodeTest {
 
 	/*
 	 * Test tree structure
@@ -46,7 +46,7 @@ public class LinkedMultiTreeNodeTest extends AbstractMultiTreeNodeTest {
 
 	@Override
 	protected <T> TreeNode<T> createTreeNode(T data) {
-		return new LinkedTreeNode<>(data);
+		return new LinkedMultiTreeNode<>(data);
 	}
 
 }

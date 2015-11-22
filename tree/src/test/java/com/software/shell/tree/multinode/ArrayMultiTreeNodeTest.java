@@ -26,7 +26,7 @@ import org.junit.Test;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class ArrayMultiTreeNodeTest extends AbstractMultiTreeNodeTest {
+public class ArrayMultiTreeNodeTest extends MultiTreeNodeTest {
 
 	/*
 	 * Test tree structure
