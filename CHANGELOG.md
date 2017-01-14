@@ -18,3 +18,7 @@
 # 0.2.3
 
 1. Enhancement - [Offer default constructors for Jackson serialization #1](https://github.com/Scalified/tree/issues/1)
+
+# 0.2.4
+
+1. Fixed broken ordering
