@@ -15,7 +15,7 @@ The Library requires [Java SE Development Kit 7](http://www.oracle.com/technetwo
 
 ```java
 dependencies {
-	compile 'com.scalified:tree:0.2.3'
+	compile 'com.scalified:tree:0.2.4'
 }
 ```
 
@@ -23,16 +23,13 @@ dependencies {
 
 [**Full ChangeLog**](https://github.com/Scalified/tree/blob/master/CHANGELOG.md)
 
-### 0.2.0 - *previous*
-
-1. Changed main interfaces to classes
-2. Added LinkedMultiTreeNode - MultiTreeNode implementation based on the leftmost-child-right-sibling representation
-3. Added subtrees clearing logic and tests
-4. New find and findAll methods - allows to find nodes within the tree with the specified data
-   
-### 0.2.3 - *current*
+### 0.2.3 - *previous*
 
 1. Enhancement - [Offer default constructors for Jackson serialization #1](https://github.com/Scalified/tree/issues/1)
+   
+### 0.2.4 - *current*
+
+1. Fixed broken ordering
         
 ### Features in the next versions:
 

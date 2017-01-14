@@ -22,7 +22,7 @@ import com.scalified.tree.TreeNodeException;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 /**
  * Implementation of the K-ary (multi node) tree data structure,
@@ -81,7 +81,7 @@ public class LinkedMultiTreeNode<T> extends MultiTreeNode<T> {
 		if (isLeaf()) {
 			return Collections.emptySet();
 		}
-		Collection<TreeNode<T>> subtrees = new HashSet<>();
+		Collection<TreeNode<T>> subtrees = new LinkedHashSet<>();
 		subtrees.add(leftMostNode);
 		LinkedMultiTreeNode<T> nextSubtree = leftMostNode.rightSiblingNode;
 		while (nextSubtree != null) {
@@ -417,7 +417,7 @@ public class LinkedMultiTreeNode<T> extends MultiTreeNode<T> {
 		if (firstNode.rightSiblingNode == null) {
 			return Collections.emptySet();
 		}
-		Collection<MultiTreeNode<T>> siblings = new HashSet<>();
+		Collection<MultiTreeNode<T>> siblings = new LinkedHashSet<>();
 		LinkedMultiTreeNode<T> nextNode = firstNode;
 		while (nextNode != null) {
 			if (!nextNode.equals(this)) {

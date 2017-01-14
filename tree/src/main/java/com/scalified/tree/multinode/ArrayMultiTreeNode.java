@@ -110,7 +110,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 		if (isLeaf()) {
 			return Collections.emptySet();
 		}
-		Collection<TreeNode<T>> subtrees = new HashSet<>(subtreesSize);
+		Collection<TreeNode<T>> subtrees = new LinkedHashSet<>(subtreesSize);
 		for (int i = 0; i < subtreesSize; i++) {
 			TreeNode<T> subtree = (TreeNode<T>) this.subtrees[i];
 			subtrees.add(subtree);
@@ -520,7 +520,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 			return Collections.emptySet();
 		}
 		Object[] parentSubtreeObjects = mParent.subtrees;
-		Collection<MultiTreeNode<T>> siblings = new HashSet<>(parentSubtreesSize - 1);
+		Collection<MultiTreeNode<T>> siblings = new LinkedHashSet<>(parentSubtreesSize - 1);
 		for (int i = 0; i < parentSubtreesSize; i++) {
 			MultiTreeNode<T> parentSubtree = (MultiTreeNode<T>) parentSubtreeObjects[i];
 			if (!parentSubtree.equals(this)) {
