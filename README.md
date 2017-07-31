@@ -15,28 +15,10 @@ The Library requires [Java SE Development Kit 7](http://www.oracle.com/technetwo
 
 ```java
 dependencies {
-	compile 'com.scalified:tree:0.2.4'
+	compile 'com.scalified:tree:0.2.5'
 }
 ```
 
-## Activity Stream
-
-[**Full ChangeLog**](https://github.com/Scalified/tree/blob/master/CHANGELOG.md)
-
-### 0.2.3 - *previous*
-
-1. Enhancement - [Offer default constructors for Jackson serialization #1](https://github.com/Scalified/tree/issues/1)
-   
-### 0.2.4 - *current*
-
-1. Fixed broken ordering
-        
-### Features in the next versions:
-
-### 0.3.0:
-
-1. Migration to Java 8
-    
 ## Theory
 
 ### Definition

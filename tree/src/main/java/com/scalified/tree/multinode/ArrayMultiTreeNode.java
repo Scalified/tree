@@ -285,7 +285,7 @@ public class ArrayMultiTreeNode<T> extends MultiTreeNode<T> {
 			protected TreeNode<T> rightSiblingNode() {
 				ArrayMultiTreeNode<T> mParent = (ArrayMultiTreeNode<T>) parent;
 				int rightSiblingNodeIndex = mParent.indexOf(ArrayMultiTreeNode.this) + 1;
-				return rightSiblingNodeIndex <= mParent.subtreesSize ?
+				return rightSiblingNodeIndex < mParent.subtreesSize ?
 						(TreeNode<T>) mParent.subtrees[rightSiblingNodeIndex] : null;
 			}
 		};
