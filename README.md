@@ -307,7 +307,7 @@ TreeNode<String> nodeToRemove = new ArrayMultiTreeNode<>("nodeToRemove");
 boolean resultRemove = node.remove(nodeToRemove);
 
 // Removing all of the tree nodes specified in the collection from the entire tree
-<Collection<TreeNode<String>> collectionToRemove;
+Collection<TreeNode<String>> collectionToRemove;
 // ... collection initialization skipped
 boolean resultRemoveAll = node.removeAll(collectionToRemove);
 
