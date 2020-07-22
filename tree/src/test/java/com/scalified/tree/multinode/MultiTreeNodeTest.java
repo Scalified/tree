@@ -16,9 +16,9 @@
 
 package com.scalified.tree.multinode;
 
-import com.scalified.tree.TreeNodeTest;
 import com.scalified.tree.TreeNode;
 import com.scalified.tree.TreeNodeException;
+import com.scalified.tree.TreeNodeTest;
 import org.junit.Test;
 
 import java.util.*;
@@ -98,9 +98,9 @@ public abstract class MultiTreeNodeTest extends TreeNodeTest {
 		assertFalse(messageAddResultFalseExpected,
 				((MultiTreeNode<String>) node8).addSubtrees(null));
 		assertFalse(messageAddResultFalseExpected,
-				((MultiTreeNode<String>) node1).addSubtrees(Collections.singletonList(null)));
+				((MultiTreeNode<String>) node1).addSubtrees(Collections.<MultiTreeNode<String>>singletonList(null)));
 		assertFalse(messageAddResultFalseExpected,
-				((MultiTreeNode<String>) node10).addSubtrees(Collections.emptyList()));
+				((MultiTreeNode<String>) node10).addSubtrees(Collections.<MultiTreeNode<String>>emptyList()));
 	}
 
 	@Test
@@ -141,9 +141,9 @@ public abstract class MultiTreeNodeTest extends TreeNodeTest {
 		assertFalse(messageNotContains, ((MultiTreeNode<String>) node1).hasSubtrees(mSubtreesContain1));
 		assertFalse(messageNotContains, ((MultiTreeNode<String>) node2).hasSubtrees(null));
 		assertFalse(messageNotContains,
-				((MultiTreeNode<String>) node2).hasSubtrees(Collections.emptyList()));
+				((MultiTreeNode<String>) node2).hasSubtrees(Collections.<MultiTreeNode<String>>emptyList()));
 		assertFalse(messageNotContains,
-				((MultiTreeNode<String>) node2).hasSubtrees(Collections.singletonList(null)));
+				((MultiTreeNode<String>) node2).hasSubtrees(Collections.<MultiTreeNode<String>>singletonList(null)));
 	}
 
 	@Test
@@ -172,9 +172,9 @@ public abstract class MultiTreeNodeTest extends TreeNodeTest {
 		assertFalse(messageRemoveResultFalse,
 				((MultiTreeNode<String>) node1).dropSubtrees(Collections.singletonList((MultiTreeNode<String>) node2)));
 		assertFalse(messageRemoveResultFalse,
-				((MultiTreeNode<String>) root).dropSubtrees(Collections.emptyList()));
+				((MultiTreeNode<String>) root).dropSubtrees(Collections.<MultiTreeNode<String>>emptyList()));
 		assertFalse(messageRemoveResultFalse,
-				((MultiTreeNode<String>) node1).dropSubtrees(Collections.singletonList(null)));
+				((MultiTreeNode<String>) node1).dropSubtrees(Collections.<MultiTreeNode<String>>singletonList(null)));
 	}
 
 }

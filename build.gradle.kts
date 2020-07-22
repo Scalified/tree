@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-apply plugin: 'java'
+allprojects {
 
-// Publishing
-if (hasProperty('JAR_PUBLISHING_SCRIPT')) {
-	apply from: properties['JAR_PUBLISHING_SCRIPT']
-}
+    group = "com.scalified"
+    version = "0.2.5"
 
-compileJava {
-	sourceCompatibility = JavaVersion.VERSION_1_7
-	targetCompatibility = JavaVersion.VERSION_1_7
-	options.warnings = false
-}
+    repositories {
+        mavenCentral()
+    }
 
-dependencies {
-    testCompile 'junit:junit:4.12'
+    tasks.withType<JavaCompile> {
+        sourceCompatibility = "${JavaVersion.VERSION_1_7}"
+        targetCompatibility = "${JavaVersion.VERSION_1_7}"
+        options.encoding = Charsets.UTF_8.name()
+    }
+
 }

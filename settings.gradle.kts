@@ -14,13 +14,5 @@
  * limitations under the License.
  */
 
-allprojects {
-
-    group = POM_GROUP_ID
-    version = POM_VERSION
-
-    repositories {
-        mavenCentral()
-    }
-
-}
+rootProject.name = "tree"
+include("tree")

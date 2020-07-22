@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * @since 1.0.0
  */
 public abstract class TreeNodeTest {
-	
+
 	/*
 	 * Test tree structure
 	 *
@@ -47,13 +47,13 @@ public abstract class TreeNodeTest {
 	 *
 	 */
 
-	protected static final String ROOT_DATA           =   "ROOT_DATA";
-	protected static final String NODE_DATA_1         =   "DATA_1";
-	protected static final String NODE_DATA_2         =   "DATA_2";
-	protected static final String NODE_DATA_3         =   "DATA_3";
-	protected static final String NODE_DATA_4         =   "DATA_4";
+	protected static final String ROOT_DATA = "ROOT_DATA";
+	protected static final String NODE_DATA_1 = "DATA_1";
+	protected static final String NODE_DATA_2 = "DATA_2";
+	protected static final String NODE_DATA_3 = "DATA_3";
+	protected static final String NODE_DATA_4 = "DATA_4";
 
-	protected static final String ANOTHER_NODE_DATA   =   "ANOTHER_NODE_DATA";
+	protected static final String ANOTHER_NODE_DATA = "ANOTHER_NODE_DATA";
 
 	protected TreeNode<String> root;
 	protected TreeNode<String> node1;
@@ -356,7 +356,7 @@ public abstract class TreeNodeTest {
 		assertFalse(messageContainNotExpected, node3.containsAll(mTreeNodesNotContain3));
 
 		assertFalse(messageContainNotExpected, root.containsAll(null));
-		assertFalse(messageContainNotExpected, node3.containsAll(Collections.emptyList()));
+		assertFalse(messageContainNotExpected, node3.containsAll(Collections.<TreeNode<String>>emptyList()));
 	}
 
 	@Test
@@ -477,7 +477,7 @@ public abstract class TreeNodeTest {
 		assertFalse(messageRemoveResultFalseExpected, root.removeAll(mNodesToRemove4));
 		assertFalse(messageRemoveResultFalseExpected, node1.removeAll(mNodesToRemove4));
 		assertFalse(messageRemoveResultFalseExpected, node2.removeAll(null));
-		assertFalse(messageRemoveResultFalseExpected, root.removeAll(Collections.emptyList()));
+		assertFalse(messageRemoveResultFalseExpected, root.removeAll(Collections.<TreeNode<String>>emptyList()));
 	}
 
 	@Test
@@ -816,10 +816,7 @@ public abstract class TreeNodeTest {
 
 		// Test the iterator common use case
 		Iterator<TreeNode<String>> mIterator3 = root.iterator();
-		while (mIterator3.hasNext()) {
-			mIterator3.next();
-		}
-		assertFalse(messageHasNextResultFalseExpected, mIterator3.hasNext());
+		assertTrue(messageHasNextResultFalseExpected, mIterator3.hasNext());
 	}
 
 	@Test(expected = NoSuchElementException.class)
