@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-rootProject.name = 'tree-root'
-include ':tree'
+plugins {
+	`java-library`
+	id("maven-publish")
+}
+
+dependencies {
+    testImplementation("junit:junit:4.12")
+}
