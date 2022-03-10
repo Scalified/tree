@@ -613,7 +613,7 @@ public abstract class TreeNode<T> implements Iterable<TreeNode<T>>, Serializable
 	 *
 	 * @param node node, which is checked to be the ancestor of the current tree
 	 *             node
-	 * @return {@code true} if the current tree node is the ancestor of the node
+	 * @return {@code true} if the current tree node is the descendant of the node
 	 *         specified; {@code false} otherwise
 	 */
 	public boolean isDescendantOf(TreeNode<T> node) {
